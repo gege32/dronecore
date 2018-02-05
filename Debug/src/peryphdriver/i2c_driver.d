@@ -1,5 +1,6 @@
-src/i2c_driver.o: ../src/i2c_driver.c ../include/i2c_driver.h \
- ../system/include/cmsis/stm32f10x.h ../system/include/cmsis/core_cm3.h \
+src/peryphdriver/i2c_driver.o: ../src/peryphdriver/i2c_driver.c \
+ ../include/peryphdriver/i2c_driver.h ../system/include/cmsis/stm32f10x.h \
+ ../system/include/cmsis/core_cm3.h \
  ../system/include/cmsis/core_cmInstr.h \
  ../system/include/cmsis/cmsis_gcc.h \
  ../system/include/cmsis/core_cmFunc.h \
@@ -28,7 +29,7 @@ src/i2c_driver.o: ../src/i2c_driver.c ../include/i2c_driver.h \
  ../system/include/stm32f1-stdperiph/stm32f10x_wwdg.h \
  ../system/include/stm32f1-stdperiph/misc.h
 
-../include/i2c_driver.h:
+../include/peryphdriver/i2c_driver.h:
 
 ../system/include/cmsis/stm32f10x.h:
 

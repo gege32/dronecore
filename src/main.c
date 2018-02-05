@@ -26,11 +26,12 @@
  */
 
 // ----------------------------------------------------------------------------
+#include <sensordriver/mpu6050_i2c_driver.h>
+#include <peryphdriver/i2c_driver.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "diag/Trace.h"
 #include "stm32f10x.h"
-#include "mpu6050_i2c_driver.h"
 
 // ----------------------------------------------------------------------------
 //
@@ -73,9 +74,55 @@ int main(int argc, char* argv[]) {
 	//testing i2c
 
 
+	I2CInit_TypeDef i2cinit;
+	I2C_Initialize(&i2cinit);
+
+	I2CDevice_TypeDef deviceSettings;
+	deviceSettings.I2Cx = I2C1;
+	deviceSettings.address = 0xd0;
+	deviceSettings.I2CSettings = i2cinit;
+
+	MPU6050Init_TypeDef init;
+	init.I2C_Device = deviceSettings;
+	init.MPU6050_AccelerometerRange = MPU6050_FS_SEL_16G;
+	init.MPU6050_ClockSource = MPU6050_PLL_GYRO_CLOCK_X;
+	init.MPU6050_GyroscopeRange = MPU6050_FS_SEL_2000;
+
+	MPU6050_init(&init);
+
+	trace_puts("MPU6050 initialized");
+
+	MPU6050_check_connection();
+
+	char* temp [10];
+	uint16_t tempnum;
 
 	// Infinite loop
 	while (1) {
+
+		tempnum = MPU6050_read_accel_X();
+		snprintf(&temp, 10, "%i accX", tempnum);
+		trace_puts(temp);
+
+		tempnum = MPU6050_read_accel_Y();
+		sprintf(&temp, "%i accY", tempnum);
+		trace_puts(temp);
+
+		tempnum = MPU6050_read_accel_Z();
+		sprintf(&temp, "%i accZ", tempnum);
+		trace_puts(temp);
+
+		tempnum = MPU6050_read_gyro_X();
+		sprintf(&temp, "%i gyroX", tempnum);
+		trace_puts(temp);
+
+		tempnum = MPU6050_read_gyro_Y();
+		sprintf(&temp, "%i gyroY", tempnum);
+		trace_puts(temp);
+
+		tempnum = MPU6050_read_gyro_Z();
+		sprintf(&temp, "%i gyroZ", tempnum);
+		trace_puts(temp);
 
 	}
 }

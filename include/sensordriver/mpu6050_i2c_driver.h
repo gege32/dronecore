@@ -8,11 +8,13 @@
 #ifndef MPU6050_I2C_DRIVER_H_
 #define MPU6050_I2C_DRIVER_H_
 
-#include "stm32f10x.h"
-#include "i2c_driver.h"
+#include <peryphdriver/i2c_driver.h>
 
 typedef struct{
-
+	uint8_t MPU6050_ClockSource;
+	uint8_t MPU6050_GyroscopeRange;
+	uint8_t MPU6050_AccelerometerRange;
+	I2CDevice_TypeDef I2C_Device;
 }MPU6050Init_TypeDef;
 
 //Address
@@ -84,7 +86,9 @@ typedef struct{
 
 #define MPU6050_PWR_MGMT_1 ((uint8_t)0x6B)
 
-MPU6050Init_TypeDef* MPU6050Settings;
+#define MPU6050_WHO_AM_I ((uint8_t)0x75)
+
+MPU6050Init_TypeDef* MPU6050_Settings;
 
 void MPU6050_init(MPU6050Init_TypeDef* MPU6050InitStruct);
 
@@ -99,6 +103,8 @@ uint16_t MPU6050_read_gyro_X();
 uint16_t MPU6050_read_gyro_Y();
 
 uint16_t MPU6050_read_gyro_Z();
+
+uint8_t MPU6050_check_connection();
 
 uint16_t MPU6050_read_temp();
 
