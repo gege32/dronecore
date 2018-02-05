@@ -26,7 +26,8 @@ src/main.o: ../src/main.c ../system/include/diag/Trace.h \
  ../system/include/stm32f1-stdperiph/stm32f10x_tim.h \
  ../system/include/stm32f1-stdperiph/stm32f10x_usart.h \
  ../system/include/stm32f1-stdperiph/stm32f10x_wwdg.h \
- ../system/include/stm32f1-stdperiph/misc.h ../include/MPU6050.h
+ ../system/include/stm32f1-stdperiph/misc.h \
+ ../include/mpu6050_i2c_driver.h ../include/i2c_driver.h
 
 ../system/include/diag/Trace.h:
 
@@ -90,4 +91,6 @@ src/main.o: ../src/main.c ../system/include/diag/Trace.h \
 
 ../system/include/stm32f1-stdperiph/misc.h:
 
-../include/MPU6050.h:
+../include/mpu6050_i2c_driver.h:
+
+../include/i2c_driver.h:

@@ -4,20 +4,20 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/MPU6050.c \
 ../src/_write.c \
+../src/i2c_driver.c \
 ../src/main.c \
 ../src/mpu6050_i2c_driver.c 
 
 OBJS += \
-./src/MPU6050.o \
 ./src/_write.o \
+./src/i2c_driver.o \
 ./src/main.o \
 ./src/mpu6050_i2c_driver.o 
 
 C_DEPS += \
-./src/MPU6050.d \
 ./src/_write.d \
+./src/i2c_driver.d \
 ./src/main.d \
 ./src/mpu6050_i2c_driver.d 
 

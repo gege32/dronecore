@@ -1,4 +1,4 @@
-src/MPU6050.o: ../src/MPU6050.c ../include/MPU6050.h \
+src/i2c_driver.o: ../src/i2c_driver.c ../include/i2c_driver.h \
  ../system/include/cmsis/stm32f10x.h ../system/include/cmsis/core_cm3.h \
  ../system/include/cmsis/core_cmInstr.h \
  ../system/include/cmsis/cmsis_gcc.h \
@@ -28,7 +28,7 @@ src/MPU6050.o: ../src/MPU6050.c ../include/MPU6050.h \
  ../system/include/stm32f1-stdperiph/stm32f10x_wwdg.h \
  ../system/include/stm32f1-stdperiph/misc.h
 
-../include/MPU6050.h:
+../include/i2c_driver.h:
 
 ../system/include/cmsis/stm32f10x.h:
 

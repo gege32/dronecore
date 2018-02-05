@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include "diag/Trace.h"
 #include "stm32f10x.h"
-#include "MPU6050.h"
+#include "mpu6050_i2c_driver.h"
 
 // ----------------------------------------------------------------------------
 //
@@ -72,15 +72,7 @@ int main(int argc, char* argv[]) {
 
 	//testing i2c
 
-	I2C1_Init();
-	MPU6050_Initialize();
-	bool test = MPU6050_TestConnection();
-	trace_puts(test);
 
-	s16 AccelGyro [16];
-	MPU6050_GetRawAccelGyro(&AccelGyro);
-
-	trace_puts(AccelGyro);
 
 	// Infinite loop
 	while (1) {
