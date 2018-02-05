@@ -11,7 +11,7 @@
  * @param  None
  * @return None
  */
-void device.GPIOx_Init(I2CInit_TypeDef I2CSettings)
+void device.I2Cx_Init(I2CInit_TypeDef I2CSettings)
 {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
 	GPIO_InitTypeDef initB;
@@ -20,13 +20,13 @@ void device.GPIOx_Init(I2CInit_TypeDef I2CSettings)
 	initB.GPIO_Pin = GPIO_Pin_All;
 	GPIO_Init(GPIOB, &initB);
 
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_device.GPIOx, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_device.I2Cx, ENABLE);
 	I2C_InitTypeDef i2cdef;
 	I2C_StructInit(&i2cdef);
 	i2cdef.I2C_ClockSpeed = 100000;
 
-	I2C_Init(device.GPIOx, &i2cdef);
-	I2C_Cmd(device.GPIOx, ENABLE);
+	I2C_Init(device.I2Cx, &i2cdef);
+	I2C_Cmd(device.I2Cx, ENABLE);
 
 }
 
@@ -42,31 +42,31 @@ void I2C_ByteWrite(I2CDevice_TypeDef device, u8* pBuffer, u8 writeAddr)
     // ENTR_CRT_SECTION();
 
     /* Send START condition */
-    I2C_GenerateSTART(device.GPIOx, ENABLE);
+    I2C_GenerateSTART(device.I2Cx, ENABLE);
 
     /* Test on EV5 and clear it */
-    while (!I2C_CheckEvent(device.GPIOx, I2C_EVENT_MASTER_MODE_SELECT));
+    while (!I2C_CheckEvent(device.I2Cx, I2C_EVENT_MASTER_MODE_SELECT));
 
     /* Send MPU6050 address for write */
-    I2C_Send7bitAddress(device.GPIOx, device.address, I2C_Direction_Transmitter);
+    I2C_Send7bitAddress(device.I2Cx, device.address, I2C_Direction_Transmitter);
 
     /* Test on EV6 and clear it */
-    while (!I2C_CheckEvent(device.GPIOx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));
+    while (!I2C_CheckEvent(device.I2Cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));
 
     /* Send the MPU6050's internal address to write to */
-    I2C_SendData(device.GPIOx, writeAddr);
+    I2C_SendData(device.I2Cx, writeAddr);
 
     /* Test on EV8 and clear it */
-    while (!I2C_CheckEvent(device.GPIOx, I2C_EVENT_MASTER_BYTE_TRANSMITTED));
+    while (!I2C_CheckEvent(device.I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED));
 
     /* Send the byte to be written */
-    I2C_SendData(device.GPIOx, *pBuffer);
+    I2C_SendData(device.I2Cx, *pBuffer);
 
     /* Test on EV8 and clear it */
-    while (!I2C_CheckEvent(device.GPIOx, I2C_EVENT_MASTER_BYTE_TRANSMITTED));
+    while (!I2C_CheckEvent(device.I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED));
 
     /* Send STOP condition */
-    I2C_GenerateSTOP(device.GPIOx, ENABLE);
+    I2C_GenerateSTOP(device.I2Cx, ENABLE);
 
     // EXT_CRT_SECTION();
 }
@@ -84,40 +84,40 @@ void I2C_BufferRead(I2CDevice_TypeDef device, u8* pBuffer, u8 readAddr, u16 NumB
     // ENTR_CRT_SECTION();
 
     /* While the bus is busy */
-    while (I2C_GetFlagStatus(device.GPIOx, I2C_FLAG_BUSY));
+    while (I2C_GetFlagStatus(device.I2Cx, I2C_FLAG_BUSY));
 
     /* Send START condition */
-    I2C_GenerateSTART(device.GPIOx, ENABLE);
+    I2C_GenerateSTART(device.I2Cx, ENABLE);
 
     /* Test on EV5 and clear it */
-    while (!I2C_CheckEvent(device.GPIOx, I2C_EVENT_MASTER_MODE_SELECT));
+    while (!I2C_CheckEvent(device.I2Cx, I2C_EVENT_MASTER_MODE_SELECT));
 
     /* Send MPU6050 address for write */
-    I2C_Send7bitAddress(device.GPIOx, device.address, I2C_Direction_Transmitter);
+    I2C_Send7bitAddress(device.I2Cx, device.address, I2C_Direction_Transmitter);
 
     /* Test on EV6 and clear it */
-    while (!I2C_CheckEvent(device.GPIOx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));
+    while (!I2C_CheckEvent(device.I2Cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));
 
     /* Clear EV6 by setting again the PE bit */
-    I2C_Cmd(device.GPIOx, ENABLE);
+    I2C_Cmd(device.I2Cx, ENABLE);
 
     /* Send the MPU6050's internal address to write to */
-    I2C_SendData(device.GPIOx, readAddr);
+    I2C_SendData(device.I2Cx, readAddr);
 
     /* Test on EV8 and clear it */
-    while (!I2C_CheckEvent(device.GPIOx, I2C_EVENT_MASTER_BYTE_TRANSMITTED));
+    while (!I2C_CheckEvent(device.I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED));
 
     /* Send STRAT condition a second time */
-    I2C_GenerateSTART(device.GPIOx, ENABLE);
+    I2C_GenerateSTART(device.I2Cx, ENABLE);
 
     /* Test on EV5 and clear it */
-    while (!I2C_CheckEvent(device.GPIOx, I2C_EVENT_MASTER_MODE_SELECT));
+    while (!I2C_CheckEvent(device.I2Cx, I2C_EVENT_MASTER_MODE_SELECT));
 
     /* Send MPU6050 address for read */
-    I2C_Send7bitAddress(device.GPIOx, device.address, I2C_Direction_Receiver);
+    I2C_Send7bitAddress(device.I2Cx, device.address, I2C_Direction_Receiver);
 
     /* Test on EV6 and clear it */
-    while (!I2C_CheckEvent(device.GPIOx, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED));
+    while (!I2C_CheckEvent(device.I2Cx, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED));
 
     /* While there is data to be read */
     while (NumByteToRead)
@@ -125,17 +125,17 @@ void I2C_BufferRead(I2CDevice_TypeDef device, u8* pBuffer, u8 readAddr, u16 NumB
         if (NumByteToRead == 1)
         {
             /* Disable Acknowledgement */
-            I2C_AcknowledgeConfig(device.GPIOx, DISABLE);
+            I2C_AcknowledgeConfig(device.I2Cx, DISABLE);
 
             /* Send STOP Condition */
-            I2C_GenerateSTOP(device.GPIOx, ENABLE);
+            I2C_GenerateSTOP(device.I2Cx, ENABLE);
         }
 
         /* Test on EV7 and clear it */
-        if (I2C_CheckEvent(device.GPIOx, I2C_EVENT_MASTER_BYTE_RECEIVED))
+        if (I2C_CheckEvent(device.I2Cx, I2C_EVENT_MASTER_BYTE_RECEIVED))
         {
             /* Read a byte from the MPU6050 */
-            *pBuffer = I2C_ReceiveData(device.GPIOx);
+            *pBuffer = I2C_ReceiveData(device.I2Cx);
 
             /* Point to the next location where the byte read will be saved */
             pBuffer++;
@@ -146,7 +146,7 @@ void I2C_BufferRead(I2CDevice_TypeDef device, u8* pBuffer, u8 readAddr, u16 NumB
     }
 
     /* Enable Acknowledgement to be ready for another reception */
-    I2C_AcknowledgeConfig(device.GPIOx, ENABLE);
+    I2C_AcknowledgeConfig(device.I2Cx, ENABLE);
     // EXT_CRT_SECTION();
 }
 
