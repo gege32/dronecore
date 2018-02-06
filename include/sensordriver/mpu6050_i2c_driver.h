@@ -22,6 +22,17 @@ typedef struct{
 
 //Config bitmaps
 
+//Ext sync+DLPF config
+#define MPU6050_DLPF_CFG_0 ((uint8_t)0x00)
+#define MPU6050_DLPF_CFG_1 ((uint8_t)0x01)
+#define MPU6050_DLPF_CFG_2 ((uint8_t)0x02)
+#define MPU6050_DLPF_CFG_3 ((uint8_t)0x03)
+#define MPU6050_DLPF_CFG_4 ((uint8_t)0x04)
+#define MPU6050_DLPF_CFG_5 ((uint8_t)0x05)
+#define MPU6050_DLPF_CFG_6 ((uint8_t)0x06)
+#define MPU6050_DLPF_CFG_7 ((uint8_t)0x07)
+
+
 //Gyroscope selftest
 #define MPU6050_XG_ST ((uint8_t)0x80)
 #define MPU6050_YG_ST ((uint8_t)0x40)
@@ -60,6 +71,8 @@ typedef struct{
 
 //Memory definition
 
+#define MPU6050_CONFIG ((uint8_t)0x1B)
+
 #define MPU6050_GYRO_CONFIG ((uint8_t)0x1B)
 #define MPU6050_ACCEL_CONFIG ((uint8_t)0x1C)
 
@@ -85,6 +98,7 @@ typedef struct{
 #define MPU6050_GYRO_ZOUT_L ((uint8_t)0x48)
 
 #define MPU6050_PWR_MGMT_1 ((uint8_t)0x6B)
+#define MPU6050_PWR_MGMT_2 ((uint8_t)0x6C)
 
 #define MPU6050_WHO_AM_I ((uint8_t)0x75)
 

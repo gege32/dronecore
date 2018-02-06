@@ -95,33 +95,39 @@ int main(int argc, char* argv[]) {
 	MPU6050_check_connection();
 
 	char* temp [10];
-	uint16_t tempnum;
+	uint16_t u_temp;
+	int16_t s_temp;
 
 	// Infinite loop
 	while (1) {
 
-		tempnum = MPU6050_read_accel_X();
-		snprintf(&temp, 10, "%i accX", tempnum);
+		s_temp = MPU6050_read_temp();
+		s_temp = (s_temp / 340) + 36.53;
+		snprintf(&temp, 10, "%i temp", s_temp);
 		trace_puts(temp);
 
-		tempnum = MPU6050_read_accel_Y();
-		sprintf(&temp, "%i accY", tempnum);
+		s_temp = MPU6050_read_accel_X();
+		snprintf(&temp, 10, "%i accX", s_temp);
 		trace_puts(temp);
 
-		tempnum = MPU6050_read_accel_Z();
-		sprintf(&temp, "%i accZ", tempnum);
+		s_temp = MPU6050_read_accel_Y();
+		sprintf(&temp, "%i accY", s_temp);
 		trace_puts(temp);
 
-		tempnum = MPU6050_read_gyro_X();
-		sprintf(&temp, "%i gyroX", tempnum);
+		s_temp = MPU6050_read_accel_Z();
+		sprintf(&temp, "%i accZ", s_temp);
 		trace_puts(temp);
 
-		tempnum = MPU6050_read_gyro_Y();
-		sprintf(&temp, "%i gyroY", tempnum);
+		u_temp = MPU6050_read_gyro_X();
+		sprintf(&temp, "%i gyroX", u_temp);
 		trace_puts(temp);
 
-		tempnum = MPU6050_read_gyro_Z();
-		sprintf(&temp, "%i gyroZ", tempnum);
+		u_temp = MPU6050_read_gyro_Y();
+		sprintf(&temp, "%i gyroY", u_temp);
+		trace_puts(temp);
+
+		u_temp = MPU6050_read_gyro_Z();
+		sprintf(&temp, "%i gyroZ", u_temp);
 		trace_puts(temp);
 
 	}
