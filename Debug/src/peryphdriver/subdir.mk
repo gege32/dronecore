@@ -4,12 +4,15 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../src/peryphdriver/I2Cdev.c \
 ../src/peryphdriver/i2c_driver.c 
 
 OBJS += \
+./src/peryphdriver/I2Cdev.o \
 ./src/peryphdriver/i2c_driver.o 
 
 C_DEPS += \
+./src/peryphdriver/I2Cdev.d \
 ./src/peryphdriver/i2c_driver.d 
 
 

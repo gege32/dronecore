@@ -105,9 +105,9 @@
   /*#define USE_STDPERIPH_DRIVER*/
 #endif
 
- typedef int bool;
- #define TRUE 1
- #define FALSE 0
+typedef int bool;
+#define TRUE 1
+#define FALSE 0
 
 /**
  * @brief In the following line adjust the value of External High Speed oscillator (HSE)
