@@ -6,16 +6,19 @@
 C_SRCS += \
 ../src/sensordriver/HMC5883L.c \
 ../src/sensordriver/MPU6050.c \
+../src/sensordriver/MPU6050_6Axis_MotionApps20.c \
 ../src/sensordriver/mpu6050_i2c_driver.c 
 
 OBJS += \
 ./src/sensordriver/HMC5883L.o \
 ./src/sensordriver/MPU6050.o \
+./src/sensordriver/MPU6050_6Axis_MotionApps20.o \
 ./src/sensordriver/mpu6050_i2c_driver.o 
 
 C_DEPS += \
 ./src/sensordriver/HMC5883L.d \
 ./src/sensordriver/MPU6050.d \
+./src/sensordriver/MPU6050_6Axis_MotionApps20.d \
 ./src/sensordriver/mpu6050_i2c_driver.d 
 
 

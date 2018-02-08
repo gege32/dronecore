@@ -26,12 +26,13 @@
  */
 
 // ----------------------------------------------------------------------------
-#include <sensordriver/mpu6050_i2c_driver.h>
-#include <peryphdriver/i2c_driver.h>
+#include <sensordriver/MPU6050.h>
+#include <peryphdriver/I2Cdev.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "diag/Trace.h"
 #include "stm32f10x.h"
+
 
 // ----------------------------------------------------------------------------
 //
@@ -73,61 +74,57 @@ int main(int argc, char* argv[]) {
 
 	//testing i2c
 
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+    GPIO_InitTypeDef initB;
+    initB.GPIO_Mode = GPIO_Mode_AF_OD;
+    initB.GPIO_Speed = GPIO_Speed_2MHz;
+    initB.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
+    GPIO_Init(GPIOB, &initB);
 
-	I2CInit_TypeDef i2cinit;
-	I2C_Initialize(&i2cinit);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1, ENABLE);
+    I2C_InitTypeDef i2cdef;
+    I2C_StructInit(&i2cdef);
+    i2cdef.I2C_ClockSpeed = 100000;
 
-	I2CDevice_TypeDef deviceSettings;
-	deviceSettings.I2Cx = I2C1;
-	deviceSettings.address = 0xd0;
-	deviceSettings.I2CSettings = i2cinit;
+    I2C_Init(I2C1, &i2cdef);
+    I2C_Cmd(I2C1, ENABLE);
 
-	MPU6050Init_TypeDef init;
-	init.I2C_Device = deviceSettings;
-	init.MPU6050_AccelerometerRange = MPU6050_FS_SEL_16G;
-	init.MPU6050_ClockSource = MPU6050_PLL_GYRO_CLOCK_X;
-	init.MPU6050_GyroscopeRange = MPU6050_FS_SEL_2000;
 
-	MPU6050_init(&init);
+	MPU6050(0xd0);
+	MPU6050_initialize();
+
+	MPU6050_testConnection();
 
 	trace_puts("MPU6050 initialized");
 
-	MPU6050_check_connection();
+	MPUdmpInitialize();
 
-	char* temp [10];
-	uint16_t u_temp;
+	char* temp [20];
 	int16_t s_temp;
+
+    Quaternion q;
+    MPUdmpGetQuaternion(&q, 0);
+    snprintf(&temp, 20, "Q: %i, %i, %i, %i", q.x, q.y, q.z, q.w);
+    trace_puts(temp);
+
+	int16_t x;
+	int16_t y;
+	int16_t z;
 
 	// Infinite loop
 	while (1) {
 
-		s_temp = MPU6050_read_temp();
+		s_temp = MPU6050_getTemperature();
 		s_temp = (s_temp / 340) + 36.53;
 		snprintf(&temp, 10, "%i temp", s_temp);
 		trace_puts(temp);
 
-		s_temp = MPU6050_read_accel_X();
-		snprintf(&temp, 10, "%i accX", s_temp);
+		MPU6050_getAcceleration(&x, &y, &z);
+		snprintf(&temp, 15, "%i, %i, %i", x, y, z);
 		trace_puts(temp);
 
-		s_temp = MPU6050_read_accel_Y();
-		sprintf(&temp, "%i accY", s_temp);
-		trace_puts(temp);
-
-		s_temp = MPU6050_read_accel_Z();
-		sprintf(&temp, "%i accZ", s_temp);
-		trace_puts(temp);
-
-		u_temp = MPU6050_read_gyro_X();
-		sprintf(&temp, "%i gyroX", u_temp);
-		trace_puts(temp);
-
-		u_temp = MPU6050_read_gyro_Y();
-		sprintf(&temp, "%i gyroY", u_temp);
-		trace_puts(temp);
-
-		u_temp = MPU6050_read_gyro_Z();
-		sprintf(&temp, "%i gyroZ", u_temp);
+		MPU6050_getRotation(&x, &y, &z);
+		snprintf(&temp, 15, "%i, %i, %i", x, y, z);
 		trace_puts(temp);
 
 	}

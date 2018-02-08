@@ -1,5 +1,6 @@
-src/main.o: ../src/main.c ../include/sensordriver/MPU6050.h \
- ../include/peryphdriver/I2Cdev.h ../system/include/cmsis/stm32f10x.h \
+src/sensordriver/MPU6050_6Axis_MotionApps20.o: \
+ ../src/sensordriver/MPU6050_6Axis_MotionApps20.c \
+ ../include/helpers/helper_3dmath.h ../system/include/cmsis/stm32f10x.h \
  ../system/include/cmsis/core_cm3.h \
  ../system/include/cmsis/core_cmInstr.h \
  ../system/include/cmsis/cmsis_gcc.h \
@@ -28,12 +29,10 @@ src/main.o: ../src/main.c ../include/sensordriver/MPU6050.h \
  ../system/include/stm32f1-stdperiph/stm32f10x_usart.h \
  ../system/include/stm32f1-stdperiph/stm32f10x_wwdg.h \
  ../system/include/stm32f1-stdperiph/misc.h \
- ../include/helpers/helper_3dmath.h ../system/include/diag/Trace.h \
- ../include/sensordriver/MPU6050_6Axis_MotionApps20.h
+ ../include/sensordriver/MPU6050_6Axis_MotionApps20.h \
+ ../include/sensordriver/MPU6050.h ../include/peryphdriver/I2Cdev.h
 
-../include/sensordriver/MPU6050.h:
-
-../include/peryphdriver/I2Cdev.h:
+../include/helpers/helper_3dmath.h:
 
 ../system/include/cmsis/stm32f10x.h:
 
@@ -95,8 +94,8 @@ src/main.o: ../src/main.c ../include/sensordriver/MPU6050.h \
 
 ../system/include/stm32f1-stdperiph/misc.h:
 
-../include/helpers/helper_3dmath.h:
-
-../system/include/diag/Trace.h:
-
 ../include/sensordriver/MPU6050_6Axis_MotionApps20.h:
+
+../include/sensordriver/MPU6050.h:
+
+../include/peryphdriver/I2Cdev.h:

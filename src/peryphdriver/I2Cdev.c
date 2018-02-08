@@ -413,10 +413,10 @@ int32_t ARM_I2C_MasterTransmit(uint32_t addr, const uint8_t *data, uint32_t num,
 		}
 
 		Timed(!I2C_GetFlagStatus(I2C1, I2C_FLAG_BTF));
-		if(!xfer_pending){
+//		if(!xfer_pending){
 			I2C_GenerateSTOP(I2C1, ENABLE);
 			Timed(I2C_GetFlagStatus(I2C1, I2C_FLAG_STOPF));
-		}
+//		}
 	}
 	return SUCCESS;
 	  errReturn:
