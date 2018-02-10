@@ -8,7 +8,7 @@
 #ifndef PERYPHDRIVER_ESP01_DRIVER_H_
 #define PERYPHDRIVER_ESP01_DRIVER_H_
 
-#include <stm32f10x_usart.h>
+#include <stm32f1xx_hal.h>
 
 #define ESP01_AT_RESTART "AT+RST"
 #define ESP01_AT_MODE_STA "AT+CWMODE=1"
@@ -21,9 +21,9 @@ typedef struct{
 
 }ESP01Connection_InitTpeDef;
 
-bool ESP01_initialize();
-bool ESP01_connect(ESP01Connection_InitTpeDef* ESP01_Connection);
-void ESP01_send_command(USART_TypeDef* USARTx, uint9_t, uint8_t lenght);
+void ESP01_initialize();
+void ESP01_connect(ESP01Connection_InitTpeDef* ESP01_Connection);
+void ESP01_send_command(USART_TypeDef* USARTx, const uint8_t* data, uint8_t lenght);
 
 
 #endif /* PERYPHDRIVER_ESP01_DRIVER_H_ */

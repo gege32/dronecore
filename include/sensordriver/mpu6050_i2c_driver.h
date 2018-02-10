@@ -8,13 +8,13 @@
 #ifndef MPU6050_I2C_DRIVER_H_
 #define MPU6050_I2C_DRIVER_H_
 
-#include <peryphdriver/i2c_driver.h>
+#include <stm32f1xx_hal.h>
 
 typedef struct{
 	uint8_t MPU6050_ClockSource;
 	uint8_t MPU6050_GyroscopeRange;
 	uint8_t MPU6050_AccelerometerRange;
-	I2CDevice_TypeDef I2C_Device;
+	uint8_t MPU6050_Adress;
 }MPU6050Init_TypeDef;
 
 //Address

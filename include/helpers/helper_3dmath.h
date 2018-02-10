@@ -30,7 +30,7 @@ THE SOFTWARE.
 #define _HELPER_3DMATH_H_
 
 #include "math.h"
-#include "stm32f10x.h"
+#include "stm32f1xx.h"
 
 typedef struct {
         float w;

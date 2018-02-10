@@ -8,14 +8,25 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include system/src/stm32f1-stdperiph/subdir.mk
--include system/src/newlib/subdir.mk
--include system/src/diag/subdir.mk
--include system/src/cortexm/subdir.mk
--include system/src/cmsis/subdir.mk
+-include system/STM32F1xx_HAL_Driver/Src/subdir.mk
+-include system/CMSIS/Device/ST/STM32F1xx/Source/subdir.mk
+-include system/CMSIS/DSP_Lib/Source/TransformFunctions/subdir.mk
+-include system/CMSIS/DSP_Lib/Source/SupportFunctions/subdir.mk
+-include system/CMSIS/DSP_Lib/Source/StatisticsFunctions/subdir.mk
+-include system/CMSIS/DSP_Lib/Source/MatrixFunctions/subdir.mk
+-include system/CMSIS/DSP_Lib/Source/FilteringFunctions/subdir.mk
+-include system/CMSIS/DSP_Lib/Source/FastMathFunctions/subdir.mk
+-include system/CMSIS/DSP_Lib/Source/ControllerFunctions/subdir.mk
+-include system/CMSIS/DSP_Lib/Source/ComplexMathFunctions/subdir.mk
+-include system/CMSIS/DSP_Lib/Source/CommonTables/subdir.mk
+-include system/CMSIS/DSP_Lib/Source/BasicMathFunctions/subdir.mk
 -include src/sensordriver/subdir.mk
 -include src/peryphdriver/subdir.mk
 -include src/subdir.mk
+-include Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/subdir.mk
+-include Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3/subdir.mk
+-include Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/subdir.mk
+-include Middlewares/Third_Party/FreeRTOS/Source/subdir.mk
 -include subdir.mk
 -include objects.mk
 

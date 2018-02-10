@@ -8,7 +8,7 @@
 #ifndef MESSAGING_H_
 #define MESSAGING_H_
 
-#include "stm32f10x.h"
+#include "stm32f1xx.h"
 
 typedef enum{
 	MSG_Initial_Handshake = 0x01,

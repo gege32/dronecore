@@ -4,21 +4,15 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/sensordriver/HMC5883L.c \
 ../src/sensordriver/MPU6050.c \
-../src/sensordriver/MPU6050_6Axis_MotionApps20.c \
 ../src/sensordriver/mpu6050_i2c_driver.c 
 
 OBJS += \
-./src/sensordriver/HMC5883L.o \
 ./src/sensordriver/MPU6050.o \
-./src/sensordriver/MPU6050_6Axis_MotionApps20.o \
 ./src/sensordriver/mpu6050_i2c_driver.o 
 
 C_DEPS += \
-./src/sensordriver/HMC5883L.d \
 ./src/sensordriver/MPU6050.d \
-./src/sensordriver/MPU6050_6Axis_MotionApps20.d \
 ./src/sensordriver/mpu6050_i2c_driver.d 
 
 
@@ -26,7 +20,7 @@ C_DEPS += \
 src/sensordriver/%.o: ../src/sensordriver/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GNU ARM Cross C Compiler'
-	arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -Og -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -ffreestanding -fno-move-loop-invariants -Wall -Wextra  -g3 -DDEBUG -DUSE_FULL_ASSERT -DTRACE -DOS_USE_TRACE_SEMIHOSTING_DEBUG -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER -DHSE_VALUE=72000000 -I"../include" -I"../system/include" -I"../system/include/cmsis" -I"../system/include/stm32f1-stdperiph" -std=gnu11 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -Og -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -ffreestanding -fno-move-loop-invariants -Wall -Wextra  -g3 -DDEBUG -DUSE_FULL_ASSERT -DTRACE -DOS_USE_TRACE_SEMIHOSTING_DEBUG -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER -DHSE_VALUE=72000000 -I"../include" -I"E:\!!devtools\szakdolgozat\DroneCore\system\CMSIS\Include" -I"E:\!!devtools\szakdolgozat\DroneCore\system\CMSIS\Device\ST\STM32F1xx\Include" -I"E:\!!devtools\szakdolgozat\DroneCore\system\STM32F1xx_HAL_Driver\Inc" -I"E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include" -I"E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3" -I"E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS" -std=gnu11 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
