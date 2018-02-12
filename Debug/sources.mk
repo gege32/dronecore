@@ -33,7 +33,9 @@ Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 \
 Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang \
 src \
 src/peryphdriver \
+src/semihosting \
 src/sensordriver \
+src/tasks \
 system/CMSIS/DSP_Lib/Source/BasicMathFunctions \
 system/CMSIS/DSP_Lib/Source/CommonTables \
 system/CMSIS/DSP_Lib/Source/ComplexMathFunctions \

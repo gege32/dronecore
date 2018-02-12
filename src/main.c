@@ -146,6 +146,7 @@ int main(void)
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
+  ITM_SendChar('a');
 
   /* Start scheduler */
   osKernelStart();
@@ -305,6 +306,7 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
 
 }
 
@@ -320,16 +322,16 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
 
     GPIO_InitTypeDef gpio;
-    gpio.Pin = GPIO_PIN_5;
+    gpio.Pin = GPIO_PIN_13;
     gpio.Pull= GPIO_PULLUP | GPIO_PULLDOWN;
     gpio.Mode = GPIO_MODE_OUTPUT_PP;
     gpio.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(GPIOA, &gpio);
+    HAL_GPIO_Init(GPIOC, &gpio);
   for(;;)
   {
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     osDelay(1000);
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
         osDelay(1000);
   }
   /* USER CODE END 5 */

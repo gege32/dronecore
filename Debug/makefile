@@ -20,7 +20,9 @@ RM := rm -rf
 -include system/CMSIS/DSP_Lib/Source/ComplexMathFunctions/subdir.mk
 -include system/CMSIS/DSP_Lib/Source/CommonTables/subdir.mk
 -include system/CMSIS/DSP_Lib/Source/BasicMathFunctions/subdir.mk
+-include src/tasks/subdir.mk
 -include src/sensordriver/subdir.mk
+-include src/semihosting/subdir.mk
 -include src/peryphdriver/subdir.mk
 -include src/subdir.mk
 -include Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/subdir.mk
