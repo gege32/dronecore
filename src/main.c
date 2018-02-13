@@ -49,6 +49,8 @@
 #include "main.h"
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
+#include "semihosting/Trace.h"
+#include "sensordriver/mpu6050_i2c_driver.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -146,8 +148,7 @@ int main(void)
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
-  ITM_SendChar('a');
-
+  trace_puts("test");
   /* Start scheduler */
   osKernelStart();
 
@@ -320,6 +321,9 @@ void StartDefaultTask(void const * argument)
 
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
+	MPU6050Init_TypeDef init;
+	init.MPU6050_Adress=0x68;
+	MPU6050_init(&init, &hi2c1);
 
     GPIO_InitTypeDef gpio;
     gpio.Pin = GPIO_PIN_13;
@@ -329,6 +333,11 @@ void StartDefaultTask(void const * argument)
     HAL_GPIO_Init(GPIOC, &gpio);
   for(;;)
   {
+	  uint16_t test = MPU6050_read_accel_X();
+	  char szoveg [10];
+	  snprintf(&szoveg, 10, "%i accx", test);
+	  trace_puts(&szoveg);
+
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     osDelay(1000);
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);

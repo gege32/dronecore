@@ -15,10 +15,11 @@ typedef struct{
 	uint8_t MPU6050_GyroscopeRange;
 	uint8_t MPU6050_AccelerometerRange;
 	uint8_t MPU6050_Adress;
+	I2C_HandleTypeDef* hi2c1;
 }MPU6050Init_TypeDef;
 
 //Address
-#define MPU6050_DEFAULT_ADDRESS 0xd0;
+#define MPU6050_DEFAULT_ADDRESS 0x68;
 
 //Config bitmaps
 
@@ -104,7 +105,7 @@ typedef struct{
 
 MPU6050Init_TypeDef* MPU6050_Settings;
 
-void MPU6050_init(MPU6050Init_TypeDef* MPU6050InitStruct);
+void MPU6050_init(MPU6050Init_TypeDef* MPU6050InitStruct, I2C_HandleTypeDef* hi2c1);
 
 uint16_t MPU6050_read_accel_X();
 

@@ -41,7 +41,9 @@ src/main.o: ../src/main.c ../include/main.h \
  D:\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/semphr.h \
  D:\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/queue.h \
  D:\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/event_groups.h \
- D:\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/timers.h
+ D:\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/timers.h \
+ ../include/semihosting/Trace.h \
+ ../include/sensordriver/mpu6050_i2c_driver.h
 
 ../include/main.h:
 
@@ -132,3 +134,7 @@ D:\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/queue.
 D:\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/event_groups.h:
 
 D:\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/timers.h:
+
+../include/semihosting/Trace.h:
+
+../include/sensordriver/mpu6050_i2c_driver.h:
