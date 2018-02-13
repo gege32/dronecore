@@ -1,5 +1,6 @@
-src/sensordriver/MPU6050.o: ../src/sensordriver/MPU6050.c \
- ../include/sensordriver/MPU6050.h \
+src/sensordriver/mpu6050.o: ../src/sensordriver/mpu6050.c \
+ ../include/sensordriver/mpu6050.h \
+ ../include/sensordriver/mpu6050registers.h \
  E:\!!devtools\szakdolgozat\DroneCore\system\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal.h \
  ../include/stm32f1xx_hal_conf.h ../include/main.h \
  E:\!!devtools\szakdolgozat\DroneCore\system\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal_rcc.h \
@@ -26,9 +27,27 @@ src/sensordriver/MPU6050.o: ../src/sensordriver/MPU6050.c \
  E:\!!devtools\szakdolgozat\DroneCore\system\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal_tim.h \
  E:\!!devtools\szakdolgozat\DroneCore\system\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal_tim_ex.h \
  E:\!!devtools\szakdolgozat\DroneCore\system\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal_uart.h \
- ../include/helpers/helper_3dmath.h
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS/cmsis_os.h \
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/FreeRTOS.h \
+ ../include/FreeRTOSConfig.h \
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/projdefs.h \
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/portable.h \
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/deprecated_definitions.h \
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3/portmacro.h \
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/mpu_wrappers.h \
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/task.h \
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/list.h \
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/timers.h \
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/task.h \
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/queue.h \
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/semphr.h \
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/queue.h \
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/event_groups.h \
+ E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/timers.h
 
-../include/sensordriver/MPU6050.h:
+../include/sensordriver/mpu6050.h:
+
+../include/sensordriver/mpu6050registers.h:
 
 E:\!!devtools\szakdolgozat\DroneCore\system\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal.h:
 
@@ -84,4 +103,36 @@ E:\!!devtools\szakdolgozat\DroneCore\system\STM32F1xx_HAL_Driver\Inc/stm32f1xx_h
 
 E:\!!devtools\szakdolgozat\DroneCore\system\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal_uart.h:
 
-../include/helpers/helper_3dmath.h:
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS/cmsis_os.h:
+
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/FreeRTOS.h:
+
+../include/FreeRTOSConfig.h:
+
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/projdefs.h:
+
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/portable.h:
+
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/deprecated_definitions.h:
+
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3/portmacro.h:
+
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/mpu_wrappers.h:
+
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/task.h:
+
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/list.h:
+
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/timers.h:
+
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/task.h:
+
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/queue.h:
+
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/semphr.h:
+
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/queue.h:
+
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/event_groups.h:
+
+E:\!!devtools\szakdolgozat\DroneCore\Middlewares\Third_Party\FreeRTOS\Source\include/timers.h:

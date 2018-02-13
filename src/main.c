@@ -50,7 +50,7 @@
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
 #include "semihosting/Trace.h"
-#include "sensordriver/mpu6050_i2c_driver.h"
+#include "sensordriver/mpu6050.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -321,9 +321,17 @@ void StartDefaultTask(void const * argument)
 
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
-	MPU6050Init_TypeDef init;
-	init.MPU6050_Adress=0x68;
-	MPU6050_init(&init, &hi2c1);
+//	MPU6050Init_TypeDef init;
+//	init.Adress=0xD0;
+//	MPU6050_init(&init, &hi2c1);
+	mpu6050_init(&hi2c1);
+	osDelay(250);
+
+	char szoveg [70];
+//	float testRes [6];
+//	MPU6050SelfTest(testRes);
+//	snprintf(szoveg, 70, "selftest result:%f", testRes);
+//	trace_puts(szoveg);
 
     GPIO_InitTypeDef gpio;
     gpio.Pin = GPIO_PIN_13;
@@ -331,17 +339,22 @@ void StartDefaultTask(void const * argument)
     gpio.Mode = GPIO_MODE_OUTPUT_PP;
     gpio.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(GPIOC, &gpio);
+
+//    MPU6050SensorData_TypeDef* SensorData = malloc(6*sizeof(uint16_t));
+    uint16_t AccelX, AccelY, AccelZ, GyroX, GyroY, GyroZ;
+
   for(;;)
   {
-	  uint16_t test = MPU6050_read_accel_X();
-	  char szoveg [10];
-	  snprintf(&szoveg, 10, "%i accx", test);
-	  trace_puts(&szoveg);
+      mpu6050_getRawData(&AccelX, &AccelY, &AccelZ, &GyroX, &GyroY, &GyroZ);
+
+//      MPU6050_read_sensor_data(SensorData);
+	  snprintf(szoveg, 70, "accx:%i,accy:%i,accz:%i,gyrox:%i,gyroy:%igyroz:%i", AccelX, AccelY, AccelZ, GyroX, GyroY, GyroZ);
+	  trace_puts(szoveg);
 
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-    osDelay(1000);
+    osDelay(200);
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-        osDelay(1000);
+        osDelay(200);
   }
   /* USER CODE END 5 */
 }
@@ -377,6 +390,7 @@ void _Error_Handler(char *file, int line)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
+    trace_puts(file);
   while(1)
   {
   }
