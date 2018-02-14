@@ -341,14 +341,19 @@ void StartDefaultTask(void const * argument)
     HAL_GPIO_Init(GPIOC, &gpio);
 
 //    MPU6050SensorData_TypeDef* SensorData = malloc(6*sizeof(uint16_t));
-    uint16_t AccelX, AccelY, AccelZ, GyroX, GyroY, GyroZ;
+//    int16_t AccelX, AccelY, AccelZ, GyroX, GyroY, GyroZ;
+    double qw, qx, qy, qz, roll, pitch, yaw;
+    mpu6050_dmpInitialize();
+    mpu6050_dmpEnable();
 
   for(;;)
   {
-      mpu6050_getRawData(&AccelX, &AccelY, &AccelZ, &GyroX, &GyroY, &GyroZ);
+	  mpu6050_getQuaternionWait(&qw, &qx, &qy, &qz);
+      mpu6050_getRollPitchYaw(qw, qx, qy, qz, &roll, &pitch, &yaw);
 
 //      MPU6050_read_sensor_data(SensorData);
-	  snprintf(szoveg, 70, "accx:%i,accy:%i,accz:%i,gyrox:%i,gyroy:%igyroz:%i", AccelX, AccelY, AccelZ, GyroX, GyroY, GyroZ);
+//	  snprintf(szoveg, 70, "accx:%i,accy:%i,accz:%i,gyrox:%i,gyroy:%igyroz:%i", AccelX, AccelY, AccelZ, GyroX, GyroY, GyroZ);
+      snprintf(szoveg, 70, "qw:%f,qx:%f,qy:%f,qz:%f,roll:%fpitch:%f,yaw:%f", qw, qx, qy, qz, roll, pitch, yaw);
 	  trace_puts(szoveg);
 
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);

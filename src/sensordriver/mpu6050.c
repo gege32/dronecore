@@ -24,9 +24,7 @@ volatile uint8_t buffer[14];
  */
 int8_t mpu6050_readBytes(uint8_t regAddr, uint8_t length, uint8_t *data) {
 
-	HAL_I2C_Master_Transmit(hi2c_handler, MPU6050_ADDR, &regAddr, 1, 10);
-
-	HAL_I2C_Master_Receive(hi2c_handler, MPU6050_ADDR, data, length, 10);
+	HAL_I2C_Mem_Read(hi2c_handler, MPU6050_ADDR, regAddr, 1, data, length, 10);
 
 	return length;
 }
@@ -38,13 +36,16 @@ int8_t mpu6050_readByte(uint8_t regAddr, uint8_t *data) {
     return mpu6050_readBytes(regAddr, 1, data);
 }
 
+void mpu6050_writeWords(uint8_t regAddr, uint8_t length, uint16_t* data) {
+	HAL_I2C_Mem_Write(hi2c_handler, MPU6050_ADDR, regAddr, 2, data, length, 10);
+}
+
 /*
  * write bytes to chip register
  */
 void mpu6050_writeBytes(uint8_t regAddr, uint8_t length, uint8_t* data) {
-    HAL_I2C_Master_Transmit(hi2c_handler, MPU6050_ADDR, &regAddr, 1, 10);
 
-    HAL_I2C_Master_Transmit(hi2c_handler, MPU6050_ADDR, data, length, 10);
+    HAL_I2C_Mem_Write(hi2c_handler, MPU6050_ADDR, regAddr, 1, data, length, 10);
 }
 
 /*
@@ -215,7 +216,7 @@ uint8_t mpu6050_writeMemoryBlock(const uint8_t *data, uint16_t dataSize, uint8_t
 
         if (useProgMem) {
             // write the chunk of data as specified
-            for (j = 0; j < chunkSize; j++) progBuffer[j] = pgm_read_byte(data + i + j);
+            for (j = 0; j < chunkSize; j++) progBuffer[j] = data[i+j];
         } else {
             // write the chunk of data as specified
             progBuffer = (uint8_t *)data + i;
@@ -269,9 +270,9 @@ uint8_t mpu6050_writeDMPConfigurationSet(const uint8_t *data, uint16_t dataSize,
     uint8_t bank, offset, length;
     for (i = 0; i < dataSize;) {
         if (useProgMem) {
-            bank = pgm_read_byte(data + i++);
-            offset = pgm_read_byte(data + i++);
-            length = pgm_read_byte(data + i++);
+            bank = data[i++];
+            offset = data[i++];
+            length = data[i++];
         } else {
             bank = data[i++];
             offset = data[i++];
@@ -283,7 +284,7 @@ uint8_t mpu6050_writeDMPConfigurationSet(const uint8_t *data, uint16_t dataSize,
             // regular block of data to write
             if (useProgMem) {
                 if (sizeof(progBuffer) < length) progBuffer = (uint8_t *)realloc(progBuffer, length);
-                for (j = 0; j < length; j++) progBuffer[j] = pgm_read_byte(data + i + j);
+                for (j = 0; j < length; j++) progBuffer[j] = data[i+j];
             } else {
                 progBuffer = (uint8_t *)data + i;
             }
@@ -296,7 +297,7 @@ uint8_t mpu6050_writeDMPConfigurationSet(const uint8_t *data, uint16_t dataSize,
             // behavior only, and exactly why (or even whether) it has to be here
             // is anybody's guess for now.
             if (useProgMem) {
-                special = pgm_read_byte(data + i++);
+                special = data[i++];
             } else {
                 special = data[i++];
             }
@@ -436,14 +437,16 @@ void mpu6050_init(I2C_HandleTypeDef* hi2c) {
     hi2c_handler = hi2c;
     HAL_I2C_Init(hi2c_handler);
 
-    mpu6050_writeBits(MPU6050_RA_PWR_MGMT_1, 7, 1, 1);
+    mpu6050_writeBit(MPU6050_RA_PWR_MGMT_1, 7, 1);
 	//allow mpu6050 chip clocks to start up
 	osDelay(100);
 
 	//set sleep disabled
-	mpu6050_setSleepDisabled();
+	mpu6050_writeByte(MPU6050_RA_PWR_MGMT_1, 0x00);
 	//wake up delay needed sleep disabled
 	osDelay(10);
+
+	mpu6050_writeByte(MPU6050_RA_PWR_MGMT_2, 0x00);
 
 	//set clock source
 	//  it is highly recommended that the device be configured to use one of the gyroscopes (or an external clock source)

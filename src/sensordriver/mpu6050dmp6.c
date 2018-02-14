@@ -20,10 +20,6 @@ Please refer to LICENSE file for licensing information.
 
 #if MPU6050_GETATTITUDE == 2
 
-#include <avr/io.h>
-#include <avr/pgmspace.h>
-#include <avr/interrupt.h>
-#include <util/delay.h>
 #include <math.h>  //include libm
 
 #define MPU6050_DMP_CODE_SIZE 1929
@@ -50,7 +46,7 @@ uint8_t mpu6050_fifoBuffer[64];
 // this block of memory gets written to the MPU on start-up, and it seems
 // to be volatile memory, so it has to be done each time (it only takes ~1
 // second though)
-const prog_uchar mpu6050_dmpMemory[MPU6050_DMP_CODE_SIZE] PROGMEM = {
+const uint8_t mpu6050_dmpMemory[MPU6050_DMP_CODE_SIZE] __attribute__((section (".USER_FLASH"))) = {
     // bank 0, 256 bytes
     0xFB, 0x00, 0x00, 0x3E, 0x00, 0x0B, 0x00, 0x36, 0x00, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x00,
     0x00, 0x65, 0x00, 0x54, 0xFF, 0xEF, 0x00, 0x00, 0xFA, 0x80, 0x00, 0x0B, 0x12, 0x82, 0x00, 0x01,
@@ -189,7 +185,7 @@ const prog_uchar mpu6050_dmpMemory[MPU6050_DMP_CODE_SIZE] PROGMEM = {
     0xB9, 0xA7, 0xF1, 0x26, 0x26, 0x26, 0xD8, 0xD8, 0xFF
 };
 
-const prog_uchar mpu6050_dmpConfig[MPU6050_DMP_CONFIG_SIZE] PROGMEM = {
+const uint8_t mpu6050_dmpConfig[MPU6050_DMP_CONFIG_SIZE] __attribute__((section (".USER_FLASH"))) = {
 //  BANK    OFFSET  LENGTH  [DATA]
     0x03,   0x7B,   0x03,   0x4C, 0xCD, 0x6C,         // FCFG_1 inv_set_gyro_calibration
     0x03,   0xAB,   0x03,   0x36, 0x56, 0x76,         // FCFG_3 inv_set_gyro_calibration
@@ -231,7 +227,7 @@ const prog_uchar mpu6050_dmpConfig[MPU6050_DMP_CONFIG_SIZE] PROGMEM = {
     // the FIFO output at the desired rate. Handling FIFO overflow cleanly is also a good idea.
 };
 
-const prog_uchar mpu6050_dmpUpdates[MPU6050_DMP_UPDATES_SIZE] PROGMEM = {
+const uint8_t mpu6050_dmpUpdates[MPU6050_DMP_UPDATES_SIZE] __attribute__((section (".USER_FLASH")))= {
     0x01,   0xB2,   0x02,   0xFF, 0xFF,
     0x01,   0x90,   0x04,   0x09, 0x23, 0xA1, 0x35,
     0x01,   0x6A,   0x02,   0x06, 0x00,
@@ -245,12 +241,20 @@ const prog_uchar mpu6050_dmpUpdates[MPU6050_DMP_UPDATES_SIZE] PROGMEM = {
  * initialize mpu6050 dmp
  */
 uint8_t mpu6050_dmpInitialize() {
-	//setup interrupt
-	MPU6050_DMP_INT0SETUP;
+
+	  /* Configure PA0 pin as input floating */
+	GPIO_InitTypeDef   GPIO_InitStructure;
+	  GPIO_InitStructure.Mode = GPIO_MODE_IT_FALLING;
+	  GPIO_InitStructure.Pull = GPIO_NOPULL;
+	  GPIO_InitStructure.Pin = GPIO_PIN_0;
+	  HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	  HAL_NVIC_SetPriority(EXTI0_IRQn, 2, 0);
+	  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 
 	//reset
 	mpu6050_writeBit(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_DEVICE_RESET_BIT, 1);
-    _delay_ms(30);//wait after reset
+    osDelay(30);//wait after reset
 
     //disable sleep mode
     mpu6050_setSleepDisabled();
@@ -271,7 +275,7 @@ uint8_t mpu6050_dmpInitialize() {
 	mpu6050_writeByte(MPU6050_RA_I2C_SLV0_ADDR + 0*3, 0x68);
 	//resetting I2C Master control
 	mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_I2C_MST_RESET_BIT, 1);
-	_delay_ms(20);
+	osDelay(20);
 
     //load DMP code into memory banks
     if (mpu6050_writeMemoryBlock(mpu6050_dmpMemory, MPU6050_DMP_CODE_SIZE, 0, 0, 1, 1) == 1) {
@@ -319,11 +323,11 @@ uint8_t mpu6050_dmpInitialize() {
             //writing final memory update 1/7 (function unknown)
             uint8_t dmpUpdate[16], j;
             uint16_t pos = 0;
-            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = pgm_read_byte(&mpu6050_dmpUpdates[pos]);
+            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
             mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
 
             //writing final memory update 2/7 (function unknown)
-            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = pgm_read_byte(&mpu6050_dmpUpdates[pos]);
+            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
             mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
 
             //reset FIFO
@@ -364,22 +368,22 @@ uint8_t mpu6050_dmpInitialize() {
             while ((fifoCount = mpu6050_getFIFOCount()) < 3);
 
             //writing final memory update 3/7 (function unknown)
-            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = pgm_read_byte(&mpu6050_dmpUpdates[pos]);
+            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
             mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
 
             //writing final memory update 4/7 (function unknown)
-            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = pgm_read_byte(&mpu6050_dmpUpdates[pos]);
+            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
             mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
 
             //writing final memory update 5/7 (function unknown)
-            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = pgm_read_byte(&mpu6050_dmpUpdates[pos]);
+            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
             mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
 
             //reading FIFO data..."));
             mpu6050_getFIFOBytes(fifoBuffer, fifoCount);
 
             //reading final memory update 6/7 (function unknown)
-            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = pgm_read_byte(&mpu6050_dmpUpdates[pos]);
+            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
             mpu6050_readMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1]);
 
             //waiting for FIFO count > 2
@@ -389,7 +393,7 @@ uint8_t mpu6050_dmpInitialize() {
             mpu6050_getFIFOBytes(fifoBuffer, fifoCount);
 
             //writing final memory update 7/7 (function unknown)
-            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = pgm_read_byte(&mpu6050_dmpUpdates[pos]);
+            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
             mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
 
             //disabling DMP (you turn it on later)
@@ -410,7 +414,6 @@ uint8_t mpu6050_dmpInitialize() {
  * enable dmp
  */
 void mpu6050_dmpEnable() {
-	MPU6050_DMP_INT0ENABLE;
 	mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_DMP_EN_BIT, 1);
 }
 
@@ -418,7 +421,6 @@ void mpu6050_dmpEnable() {
  * disable dmp
  */
 void mpu6050_dmpDisable() {
-	MPU6050_DMP_INT0DISABLE;
 	mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_DMP_EN_BIT, 0);
 }
 
@@ -475,11 +477,11 @@ uint8_t mpu6050_getQuaternionWait(double *qw, double *qx, double *qy, double *qz
 	return 0;
 }
 
-/*
- * on interrupt set data availabe
- */
-ISR (INT0_vect) {
-	mpu6050_mpuInterrupt = 1;
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if(GPIO_Pin == GPIO_PIN_0){
+		mpu6050_mpuInterrupt = 1;
+	}
 }
 
 #endif
