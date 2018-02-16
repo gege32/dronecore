@@ -37,7 +37,13 @@ int8_t mpu6050_readByte(uint8_t regAddr, uint8_t *data) {
 }
 
 void mpu6050_writeWords(uint8_t regAddr, uint8_t length, uint16_t* data) {
-	HAL_I2C_Mem_Write(hi2c_handler, MPU6050_ADDR, regAddr, 2, data, length, 30);
+	uint8_t i;
+	uint8_t buf [2];
+	for(i = 0; i < length; i++){
+		buf[0] = (uint8_t)(data[i] >> 8);
+		buf[1] = (uint8_t)data[i];
+		HAL_I2C_Mem_Write(hi2c_handler, MPU6050_ADDR, regAddr, 1, buf, 2, 30);
+	}
 }
 
 /*
@@ -434,7 +440,6 @@ uint8_t mpu6050_testConnection() {
 void mpu6050_init(I2C_HandleTypeDef* hi2c) {
 
     hi2c_handler = hi2c;
-    HAL_I2C_Init(hi2c_handler);
 
     mpu6050_writeBit(MPU6050_RA_PWR_MGMT_1, 7, 1);
 	//allow mpu6050 chip clocks to start up
@@ -444,8 +449,6 @@ void mpu6050_init(I2C_HandleTypeDef* hi2c) {
 	mpu6050_setSleepDisabled();
 	//wake up delay needed sleep disabled
 	osDelay(10);
-
-	mpu6050_writeByte(MPU6050_RA_PWR_MGMT_2, 0x00);
 
 	//set clock source
 	//  it is highly recommended that the device be configured to use one of the gyroscopes (or an external clock source)

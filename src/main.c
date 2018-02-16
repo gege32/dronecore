@@ -343,14 +343,15 @@ void StartDefaultTask(void const * argument)
 //    MPU6050SensorData_TypeDef* SensorData = malloc(6*sizeof(uint16_t));
 //    int16_t AccelX, AccelY, AccelZ, GyroX, GyroY, GyroZ;
     double qw, qx, qy, qz, roll, pitch, yaw;
-    mpu6050_init(&hi2c1);
-    mpu6050_dmpEnable();
+
     mpu6050_dmpInitialize();
+    mpu6050_dmpEnable();
 
   for(;;)
   {
 	  mpu6050_getQuaternionWait(&qw, &qx, &qy, &qz);
       mpu6050_getRollPitchYaw(qw, qx, qy, qz, &roll, &pitch, &yaw);
+//	  mpu6050_getRawData(&AccelX, &AccelY, &AccelZ, &GyroX, &GyroY, &GyroZ);
 
 //      MPU6050_read_sensor_data(SensorData);
 //	  snprintf(szoveg, 70, "accx:%i,accy:%i,accz:%i,gyrox:%i,gyroy:%igyroz:%i", AccelX, AccelY, AccelZ, GyroX, GyroY, GyroZ);
