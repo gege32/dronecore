@@ -278,10 +278,13 @@ uint8_t mpu6050_dmpInitialize() {
 	osDelay(20);
 
     //load DMP code into memory banks
+	trace_puts("start write prog");
     if (mpu6050_writeMemoryBlock(mpu6050_dmpMemory, MPU6050_DMP_CODE_SIZE, 0, 0, 1, 1) == 1) {
+    	trace_puts("prog ok, dmp conf");
         if (mpu6050_writeDMPConfigurationSet(mpu6050_dmpConfig, MPU6050_DMP_CONFIG_SIZE, 1)) {
-
+        	trace_puts("dmp conf ok");
         	//set clock source
+        	osDelay(10);
         	mpu6050_writeBits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH, MPU6050_CLOCK_PLL_ZGYRO);
 
         	//set DMP and FIFO_OFLOW interrupts enabled
@@ -316,11 +319,13 @@ uint8_t mpu6050_dmpInitialize() {
             mpu6050_setZGyroOffset(zgOffset);
 
             //set X/Y/Z gyro user offsets to zero
+            trace_puts("g offs");
             mpu6050_writeWords(MPU6050_RA_XG_OFFS_USRH, 1, 0);
             mpu6050_writeWords(MPU6050_RA_YG_OFFS_USRH, 1, 0);
             mpu6050_writeWords(MPU6050_RA_ZG_OFFS_USRH, 1, 0);
 
             //writing final memory update 1/7 (function unknown)
+            trace_puts("mem update");
             uint8_t dmpUpdate[16], j;
             uint16_t pos = 0;
             for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
@@ -364,8 +369,11 @@ uint8_t mpu6050_dmpInitialize() {
             //resetting DMP
             mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_DMP_RESET_BIT, 1);
 
+            osDelay(2);
+
             //waiting for FIFO count > 2
             while ((fifoCount = mpu6050_getFIFOCount()) < 3);
+            trace_puts("fifo ok");
 
             //writing final memory update 3/7 (function unknown)
             for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
@@ -402,9 +410,11 @@ uint8_t mpu6050_dmpInitialize() {
             //resetting FIFO and clearing INT status one last time
             mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_FIFO_RESET_BIT, 1);
         } else {
+        	trace_puts("failed to load dmp2");
             return 2; // configuration block loading failed
         }
     } else {
+    	trace_puts("failed to load dmp");
         return 1; // main binary block loading failed
     }
     return 0; // success
