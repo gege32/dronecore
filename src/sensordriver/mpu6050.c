@@ -24,7 +24,7 @@ volatile uint8_t buffer[14];
  */
 int8_t mpu6050_readBytes(uint8_t regAddr, uint8_t length, uint8_t *data) {
 
-	HAL_I2C_Mem_Read(hi2c_handler, MPU6050_ADDR, regAddr, 1, data, length, 10);
+	HAL_I2C_Mem_Read(hi2c_handler, MPU6050_ADDR, regAddr, 1, data, length, 30);
 
 	return length;
 }
@@ -37,7 +37,7 @@ int8_t mpu6050_readByte(uint8_t regAddr, uint8_t *data) {
 }
 
 void mpu6050_writeWords(uint8_t regAddr, uint8_t length, uint16_t* data) {
-	HAL_I2C_Mem_Write(hi2c_handler, MPU6050_ADDR, regAddr, 2, data, length, 10);
+	HAL_I2C_Mem_Write(hi2c_handler, MPU6050_ADDR, regAddr, 2, data, length, 30);
 }
 
 /*
@@ -45,7 +45,7 @@ void mpu6050_writeWords(uint8_t regAddr, uint8_t length, uint16_t* data) {
  */
 void mpu6050_writeBytes(uint8_t regAddr, uint8_t length, uint8_t* data) {
 
-    HAL_I2C_Mem_Write(hi2c_handler, MPU6050_ADDR, regAddr, 1, data, length, 10);
+    HAL_I2C_Mem_Write(hi2c_handler, MPU6050_ADDR, regAddr, 1, data, length, 30);
 }
 
 /*
@@ -251,6 +251,7 @@ uint8_t mpu6050_writeMemoryBlock(const uint8_t *data, uint16_t dataSize, uint8_t
     }
     if (verify) free(verifyBuffer);
     if (useProgMem) free(progBuffer);
+    mpu6050_setMemoryBank(bank, 0, 0);
     return 1;
 }
 
@@ -405,7 +406,6 @@ void mpu6050_setZGyroOffset(int8_t offset) {
  * set sleep disabled
  */
 void mpu6050_setSleepDisabled() {
-    mpu6050_writeBit(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CYCLE_BIT, 1);
 	mpu6050_writeBit(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, 0);
 }
 
@@ -414,7 +414,6 @@ void mpu6050_setSleepDisabled() {
  */
 void mpu6050_setSleepEnabled() {
 	mpu6050_writeBit(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, 1);
-	mpu6050_writeBit(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CYCLE_BIT, 0);
 }
 
 
@@ -442,7 +441,7 @@ void mpu6050_init(I2C_HandleTypeDef* hi2c) {
 	osDelay(100);
 
 	//set sleep disabled
-	mpu6050_writeByte(MPU6050_RA_PWR_MGMT_1, 0x00);
+	mpu6050_setSleepDisabled();
 	//wake up delay needed sleep disabled
 	osDelay(10);
 

@@ -137,7 +137,7 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 256);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -337,14 +337,15 @@ void StartDefaultTask(void const * argument)
     gpio.Pin = GPIO_PIN_13;
     gpio.Pull= GPIO_PULLUP | GPIO_PULLDOWN;
     gpio.Mode = GPIO_MODE_OUTPUT_PP;
-    gpio.Speed = GPIO_SPEED_FREQ_LOW;
+    gpio.Speed = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init(GPIOC, &gpio);
 
 //    MPU6050SensorData_TypeDef* SensorData = malloc(6*sizeof(uint16_t));
 //    int16_t AccelX, AccelY, AccelZ, GyroX, GyroY, GyroZ;
     double qw, qx, qy, qz, roll, pitch, yaw;
-    mpu6050_dmpInitialize();
+    mpu6050_init(&hi2c1);
     mpu6050_dmpEnable();
+    mpu6050_dmpInitialize();
 
   for(;;)
   {
