@@ -349,6 +349,7 @@ void StartDefaultTask(void const * argument)
 
   for(;;)
   {
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
 	  mpu6050_getQuaternionWait(&qw, &qx, &qy, &qz);
       mpu6050_getRollPitchYaw(qw, qx, qy, qz, &roll, &pitch, &yaw);
 //	  mpu6050_getRawData(&AccelX, &AccelY, &AccelZ, &GyroX, &GyroY, &GyroZ);
@@ -358,10 +359,9 @@ void StartDefaultTask(void const * argument)
       snprintf(szoveg, 70, "qw:%f,qx:%f,qy:%f,qz:%f,roll:%fpitch:%f,yaw:%f", qw, qx, qy, qz, roll, pitch, yaw);
 	  trace_puts(szoveg);
 
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-    osDelay(200);
+
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-        osDelay(200);
+        osDelay(10);
   }
   /* USER CODE END 5 */
 }
