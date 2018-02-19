@@ -22,7 +22,7 @@ Please refer to LICENSE file for licensing information.
 
 #include <math.h>  //include libm
 
-#define MPU6050_DMP_CODE_SIZE 1929
+#define MPU6050_DMP_CODE_SIZE 3062
 #define MPU6050_DMP_CONFIG_SIZE 192
 #define MPU6050_DMP_UPDATES_SIZE 47
 
@@ -285,7 +285,7 @@ const uint8_t mpu6050_dmpConfig[MPU6050_DMP_CONFIG_SIZE] __attribute__((section 
     0x07,   0x46,   0x01,   0x9A,                     // CFG_GYRO_SOURCE inv_send_gyro
     0x07,   0x47,   0x04,   0xF1, 0x28, 0x30, 0x38,   // CFG_9 inv_send_gyro -> inv_construct3_fifo
     0x07,   0x6C,   0x04,   0xF1, 0x28, 0x30, 0x38,   // CFG_12 inv_send_accel -> inv_construct3_fifo
-    0x02,   0x16,   0x02,   0x00, 0x09                // D_0_22 inv_set_fifo_rate
+    0x02,   0x16,   0x02,   0x00, 0x15                // D_0_22 inv_set_fifo_rate
 
     // This very last 0x01 WAS a 0x09, which drops the FIFO rate down to 20 Hz. 0x07 is 25 Hz,
     // 0x01 is 100Hz. Going faster than 100Hz (0x00=200Hz) tends to result in very noisy data.
@@ -309,16 +309,6 @@ const uint8_t mpu6050_dmpUpdates[MPU6050_DMP_UPDATES_SIZE] __attribute__((sectio
  * initialize mpu6050 dmp
  */
 uint8_t mpu6050_dmpInitialize() {
-
-	  /* Configure PA0 pin as input floating */
-	GPIO_InitTypeDef   GPIO_InitStructure;
-	  GPIO_InitStructure.Mode = GPIO_MODE_IT_RISING;
-	  GPIO_InitStructure.Pull = GPIO_NOPULL;
-	  GPIO_InitStructure.Pin = GPIO_PIN_1;
-	  HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-	  HAL_NVIC_SetPriority(EXTI1_IRQn, 5, 0);
-	  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 
 	//reset
 	mpu6050_writeBit(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_DEVICE_RESET_BIT, 1);
@@ -346,11 +336,8 @@ uint8_t mpu6050_dmpInitialize() {
 	osDelay(20);
 
     //load DMP code into memory banks
-	trace_puts("start write prog");
     if (mpu6050_writeMemoryBlock(mpu6050_dmpMemory, MPU6050_DMP_CODE_SIZE, 0, 0, 1, 1) == 1) {
-    	trace_puts("prog ok, dmp conf");
         if (mpu6050_writeDMPConfigurationSet(mpu6050_dmpConfig, MPU6050_DMP_CONFIG_SIZE, 1)) {
-        	trace_puts("dmp conf ok");
         	//set clock source
         	osDelay(10);
         	mpu6050_writeBits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH, MPU6050_CLOCK_PLL_ZGYRO);
@@ -387,13 +374,11 @@ uint8_t mpu6050_dmpInitialize() {
             mpu6050_setZGyroOffset(zgOffset);
 
             //set X/Y/Z gyro user offsets to zero
-            trace_puts("g offs");
             mpu6050_writeWords(MPU6050_RA_XG_OFFS_USRH, 1, 0);
             mpu6050_writeWords(MPU6050_RA_YG_OFFS_USRH, 1, 0);
             mpu6050_writeWords(MPU6050_RA_ZG_OFFS_USRH, 1, 0);
 
             //writing final memory update 1/7 (function unknown)
-            trace_puts("mem update");
             uint8_t dmpUpdate[16], j;
             uint16_t pos = 0;
             for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
@@ -449,7 +434,6 @@ uint8_t mpu6050_dmpInitialize() {
 
             //waiting for FIFO count > 2
             while ((fifoCount = mpu6050_getFIFOCount()) < 3);
-            trace_puts("fifo ok");
 
             //writing final memory update 3/7 (function unknown)
             for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
@@ -493,6 +477,7 @@ uint8_t mpu6050_dmpInitialize() {
     	trace_puts("failed to load dmp");
         return 1; // main binary block loading failed
     }
+    trace_puts("dmp ok");
     return 0; // success
 }
 
@@ -538,9 +523,6 @@ void mpu6050_getRollPitchYaw(double qw, double qx, double qy, double qz, double 
  * get quaternion and wait
  */
 uint8_t mpu6050_getQuaternionWait(double *qw, double *qx, double *qy, double *qz) {
-	while (!mpu6050_mpuInterrupt && mpu6050_fifoCount < MPU6050_DMP_dmpPacketSize);
-	//reset interrupt
-	mpu6050_mpuInterrupt = 0;
 
 	//check for overflow
 	mpu6050_mpuIntStatus = mpu6050_getIntStatus();
@@ -561,14 +543,6 @@ uint8_t mpu6050_getQuaternionWait(double *qw, double *qx, double *qy, double *qz
 	}
 
 	return 0;
-}
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-    trace_puts("CB");
-	if(GPIO_Pin == GPIO_PIN_4){
-		mpu6050_mpuInterrupt = 1;
-	}
 }
 
 #endif

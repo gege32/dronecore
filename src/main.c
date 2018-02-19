@@ -50,7 +50,7 @@
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
 #include "semihosting/Trace.h"
-#include "sensordriver/mpu6050.h"
+#include "tasks/sensors.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -64,6 +64,8 @@ I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart1;
 
 osThreadId defaultTaskHandle;
+
+TaskHandle_t xSensorsTask = NULL;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -141,6 +143,7 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
+  xTaskCreate(SensorMeasurementTask, "sensorTask", 256, &hi2c1, 3, xSensorsTask);
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
@@ -319,49 +322,13 @@ static void MX_GPIO_Init(void)
 void StartDefaultTask(void const * argument)
 {
 
-  /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-//	MPU6050Init_TypeDef init;
-//	init.Adress=0xD0;
-//	MPU6050_init(&init, &hi2c1);
-	mpu6050_init(&hi2c1);
-	osDelay(250);
-
-	char szoveg [70];
-//	float testRes [6];
-//	MPU6050SelfTest(testRes);
-//	snprintf(szoveg, 70, "selftest result:%f", testRes);
-//	trace_puts(szoveg);
-
-    GPIO_InitTypeDef gpio;
-    gpio.Pin = GPIO_PIN_13;
-    gpio.Pull= GPIO_PULLUP | GPIO_PULLDOWN;
-    gpio.Mode = GPIO_MODE_OUTPUT_PP;
-    gpio.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(GPIOC, &gpio);
-
-//    MPU6050SensorData_TypeDef* SensorData = malloc(6*sizeof(uint16_t));
-//    int16_t AccelX, AccelY, AccelZ, GyroX, GyroY, GyroZ;
-    double qw, qx, qy, qz, roll, pitch, yaw;
-
-    mpu6050_dmpInitialize();
-    mpu6050_dmpEnable();
-
   for(;;)
   {
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-	  mpu6050_getQuaternionWait(&qw, &qx, &qy, &qz);
-      mpu6050_getRollPitchYaw(qw, qx, qy, qz, &roll, &pitch, &yaw);
-//	  mpu6050_getRawData(&AccelX, &AccelY, &AccelZ, &GyroX, &GyroY, &GyroZ);
+      osDelay(500);
 
-//      MPU6050_read_sensor_data(SensorData);
-//	  snprintf(szoveg, 70, "accx:%i,accy:%i,accz:%i,gyrox:%i,gyroy:%igyroz:%i", AccelX, AccelY, AccelZ, GyroX, GyroY, GyroZ);
-      snprintf(szoveg, 70, "qw:%f,qx:%f,qy:%f,qz:%f,roll:%fpitch:%f,yaw:%f", qw, qx, qy, qz, roll, pitch, yaw);
-	  trace_puts(szoveg);
-
-
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-        osDelay(10);
+	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+        osDelay(500);
   }
   /* USER CODE END 5 */
 }
