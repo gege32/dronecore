@@ -27,6 +27,9 @@ void SensorMeasurementTask(void const* argument){
     HAL_GPIO_Init(GPIOC, &gpio);
 
     double qw, qx, qy, qz, roll, pitch, yaw;
+//    double roll2, pitch2, yaw2;
+    double qw2, qx2, qy2, qz2;
+    qw2 = qx2 = qy2 = qz2 = 0;
 
     mpu6050_dmpInitialize();
     mpu6050_dmpEnable();
@@ -48,10 +51,17 @@ void SensorMeasurementTask(void const* argument){
 		xSemaphoreTake(dataReady, portMAX_DELAY);
 
 		  mpu6050_getQuaternionWait(&qw, &qx, &qy, &qz);
-	      mpu6050_getRollPitchYaw(qw, qx, qy, qz, &roll, &pitch, &yaw);
+//	      mpu6050_getRollPitchYaw(qw, qx, qy, qz, &roll, &pitch, &yaw);
 
-	      snprintf(szoveg, 70, "qw:%f,qx:%f,qy:%f,qz:%f,roll:%fpitch:%f,yaw:%f", qw, qx, qy, qz, roll, pitch, yaw);
-		  trace_puts(szoveg);
+	      if(qw2 != qw || qx2 != qx || qz2 != qz || qy2 != qy){
+//	    	  snprintf(szoveg, 70, "qw:%f,qx:%f,qy:%f,qz:%f,roll:%fpitch:%f,yaw:%f", qw, qx, qy, qz, roll, pitch, yaw);
+	    	  snprintf(szoveg, 70, "qw:%.3f,qx:%.3f,qy:%.3f,qz:%.3f", qw, qx, qy, qz);
+	    	  trace_puts(szoveg);
+	      }
+	      qw2 = qw;
+		  qx2 = qx;
+		  qy2 = qy;
+		  qz2 = qz;
 	}
 
 }

@@ -285,7 +285,7 @@ const uint8_t mpu6050_dmpConfig[MPU6050_DMP_CONFIG_SIZE] __attribute__((section 
     0x07,   0x46,   0x01,   0x9A,                     // CFG_GYRO_SOURCE inv_send_gyro
     0x07,   0x47,   0x04,   0xF1, 0x28, 0x30, 0x38,   // CFG_9 inv_send_gyro -> inv_construct3_fifo
     0x07,   0x6C,   0x04,   0xF1, 0x28, 0x30, 0x38,   // CFG_12 inv_send_accel -> inv_construct3_fifo
-    0x02,   0x16,   0x02,   0x00, 0x15                // D_0_22 inv_set_fifo_rate
+    0x02,   0x16,   0x02,   0x00, 0x09                // D_0_22 inv_set_fifo_rate
 
     // This very last 0x01 WAS a 0x09, which drops the FIFO rate down to 20 Hz. 0x07 is 25 Hz,
     // 0x01 is 100Hz. Going faster than 100Hz (0x00=200Hz) tends to result in very noisy data.
@@ -527,10 +527,10 @@ uint8_t mpu6050_getQuaternionWait(double *qw, double *qx, double *qy, double *qz
 	//check for overflow
 	mpu6050_mpuIntStatus = mpu6050_getIntStatus();
 	mpu6050_fifoCount = mpu6050_getFIFOCount();
-	if ((mpu6050_mpuIntStatus & 0x10) || mpu6050_fifoCount == 1024) {
+	if (mpu6050_fifoCount == 1024) {
 		//reset
 		mpu6050_resetFIFO();
-	} else if (mpu6050_mpuIntStatus & 0x02) {
+	} else{
 		//wait for correct available data length, should be a VERY short wait
 		while (mpu6050_fifoCount < MPU6050_DMP_dmpPacketSize)
 			mpu6050_fifoCount = mpu6050_getFIFOCount();
