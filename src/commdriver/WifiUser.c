@@ -19,7 +19,7 @@ void  Wifi_UserProcess(void)
   {    
     if(last!=1)
 	{
-		
+        Wifi_Station_ConnectToAp("Fostartaly", "q1e3tw2r4", "00:11:22:33:44:55");
 	}
     last=1;
   }

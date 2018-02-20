@@ -152,18 +152,10 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  int8_t success = 0;
-  char szoveg [10];
-  success = xTaskCreate(SensorMeasurementTask, "sensorTask", 256, &hi2c1, 3, xSensorsTask);
-  snprintf(szoveg, 5, "%i", success);
-  trace_puts(szoveg);
-  success = xTaskCreate(CommunicationTask, "communicationTask", 128, &huart1, 4, xCommTask);
-  snprintf(szoveg, 5, "%i", success);
-  trace_puts(szoveg);
+  xTaskCreate(SensorMeasurementTask, "sensorTask", 256, &hi2c1, 3, xSensorsTask);
+//  xTaskCreate(CommunicationTask, "communicationTask", 128, &huart1, 4, xCommTask);
 
-  size_t freeheap = xPortGetFreeHeapSize();
-  snprintf(szoveg, 10, "%i", freeheap);
-  trace_puts(szoveg);
+//  Wifi_Init(osPriorityNormal, &huart1);
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 

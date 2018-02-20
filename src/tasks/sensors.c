@@ -48,12 +48,12 @@ void SensorMeasurementTask(void const* argument){
 
 	for(;;){
 
-		xSemaphoreTake(dataReady, portMAX_DELAY);
+//		xSemaphoreTake(dataReady, portMAX_DELAY);
 
 		  mpu6050_getQuaternionWait(&qw, &qx, &qy, &qz);
 //	      mpu6050_getRollPitchYaw(qw, qx, qy, qz, &roll, &pitch, &yaw);
 
-	      if(qw2 != qw || qx2 != qx || qz2 != qz || qy2 != qy){
+	      if((abs(qx-qx2) > 0.01) || (abs(qw-qw2) > 0.01) || (abs(qz-qz2) > 0.01) || (abs(qy-qy2) > 0.01)){
 //	    	  snprintf(szoveg, 70, "qw:%f,qx:%f,qy:%f,qz:%f,roll:%fpitch:%f,yaw:%f", qw, qx, qy, qz, roll, pitch, yaw);
 	    	  snprintf(szoveg, 70, "qw:%.3f,qx:%.3f,qy:%.3f,qz:%.3f", qw, qx, qy, qz);
 	    	  trace_puts(szoveg);
@@ -69,6 +69,6 @@ void SensorMeasurementTask(void const* argument){
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin == GPIO_PIN_5){
-		xSemaphoreGiveFromISR(dataReady, pdFALSE);
+//		xSemaphoreGiveFromISR(dataReady, pdFALSE);
 	}
 }
