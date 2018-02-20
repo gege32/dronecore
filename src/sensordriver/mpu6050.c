@@ -24,7 +24,7 @@ volatile uint8_t buffer[14];
  */
 int8_t mpu6050_readBytes(uint8_t regAddr, uint8_t length, uint8_t *data) {
 
-	HAL_I2C_Mem_Read(hi2c_handler, MPU6050_ADDR, regAddr, 1, data, length, 30);
+	HAL_I2C_Mem_Read(i2c_handle, MPU6050_ADDR, regAddr, 1, data, length, 30);
 
 	return length;
 }
@@ -42,7 +42,7 @@ void mpu6050_writeWords(uint8_t regAddr, uint8_t length, uint16_t* data) {
 	for(i = 0; i < length; i++){
 		buf[0] = (uint8_t)(data[i] >> 8);
 		buf[1] = (uint8_t)data[i];
-		HAL_I2C_Mem_Write(hi2c_handler, MPU6050_ADDR, regAddr, 1, buf, 2, 30);
+		HAL_I2C_Mem_Write(i2c_handle, MPU6050_ADDR, regAddr, 1, buf, 2, 30);
 	}
 }
 
@@ -51,7 +51,7 @@ void mpu6050_writeWords(uint8_t regAddr, uint8_t length, uint16_t* data) {
  */
 void mpu6050_writeBytes(uint8_t regAddr, uint8_t length, uint8_t* data) {
 
-    HAL_I2C_Mem_Write(hi2c_handler, MPU6050_ADDR, regAddr, 1, data, length, 30);
+    HAL_I2C_Mem_Write(i2c_handle, MPU6050_ADDR, regAddr, 1, data, length, 30);
 }
 
 /*
@@ -438,8 +438,7 @@ uint8_t mpu6050_testConnection() {
  * initialize the accel and gyro
  */
 void mpu6050_init(I2C_HandleTypeDef* hi2c) {
-
-    hi2c_handler = hi2c;
+    i2c_handle = hi2c;
 
     mpu6050_writeBit(MPU6050_RA_PWR_MGMT_1, 7, 1);
 	//allow mpu6050 chip clocks to start up

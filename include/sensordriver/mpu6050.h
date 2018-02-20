@@ -100,7 +100,7 @@ References:
 extern volatile uint8_t mpu6050_mpuInterrupt;
 #endif
 
-I2C_HandleTypeDef* hi2c_handler;
+I2C_HandleTypeDef* i2c_handle;
 
 //functions
 extern void mpu6050_init(I2C_HandleTypeDef* hi2c);
