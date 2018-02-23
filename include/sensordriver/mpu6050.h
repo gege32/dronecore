@@ -20,6 +20,7 @@ References:
 #include "sensordriver/mpu6050registers.h"
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
+#include "arm_math.h"
 //definitions
 #define MPU6050_ADDR (0x68 <<1) //device address - 0x68 pin low (GND), 0x69 pin high (VCC)
 
@@ -108,7 +109,7 @@ extern uint8_t mpu6050_testConnection();
 
 #if MPU6050_GETATTITUDE == 0
 extern void mpu6050_getRawData(int16_t* ax, int16_t* ay, int16_t* az, int16_t* gx, int16_t* gy, int16_t* gz);
-extern void mpu6050_getConvData(double* axg, double* ayg, double* azg, double* gxds, double* gyds, double* gzds);
+extern void mpu6050_getConvData(float32_t* axg, float32_t* ayg, float32_t* azg, float32_t* gxds, float32_t* gyds, float32_t* gzds);
 #endif
 
 extern void mpu6050_setSleepDisabled();
@@ -125,8 +126,8 @@ extern void mpu6050_writeBit(uint8_t regAddr, uint8_t bitNum, uint8_t data);
 
 #if MPU6050_GETATTITUDE == 1
 extern void mpu6050_updateQuaternion();
-extern void mpu6050_getQuaternion(double *qw, double *qx, double *qy, double *qz);
-extern void mpu6050_getRollPitchYaw(double *pitch, double *roll, double *yaw);
+extern void mpu6050_getQuaternion(float32_t *qw, float32_t *qx, float32_t *qy, float32_t *qz);
+extern void mpu6050_getRollPitchYaw(float32_t *pitch, float32_t *roll, float32_t *yaw);
 #endif
 
 #if MPU6050_GETATTITUDE == 2
@@ -150,9 +151,9 @@ extern void mpu6050_setZGyroOffset(int8_t offset);
 extern uint8_t mpu6050_dmpInitialize();
 extern void mpu6050_dmpEnable();
 extern void mpu6050_dmpDisable();
-extern void mpu6050_getQuaternion(const uint8_t* packet, double *qw, double *qx, double *qy, double *qz);
-extern void mpu6050_getRollPitchYaw(double qw, double qx, double qy, double qz, double *roll, double *pitch, double *yaw);
-extern uint8_t mpu6050_getQuaternionWait(double *qw, double *qx, double *qy, double *qz);
+extern void mpu6050_getQuaternion(const uint8_t* packet, q31_t *datawxyz);
+extern void mpu6050_getRollPitchYaw(float32_t qw, float32_t qx, float32_t qy, float32_t qz, float32_t *roll, float32_t *pitch, float32_t *yaw);
+extern uint8_t mpu6050_getQuaternionWait(q31_t *datawxyz);
 #endif
 
 #endif

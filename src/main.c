@@ -52,6 +52,8 @@
 #include "semihosting/Trace.h"
 #include "tasks/sensors.h"
 #include "tasks/communication.h"
+#include "tasks/flightcontroller.h"
+#include "datamodels.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -71,6 +73,10 @@ osThreadId defaultTaskHandle;
 TaskHandle_t xSensorsTask = NULL;
 
 TaskHandle_t xCommTask = NULL;
+
+TaskHandle_t xFlightControllerTask = NULL;
+
+QueueHandle_t sensorDataQueue;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -152,8 +158,18 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  xTaskCreate(SensorMeasurementTask, "sensorTask", 256, &hi2c1, 3, xSensorsTask);
+  BaseType_t task1 = xTaskCreate(SensorMeasurementTask, "sensorTask", 256, &hi2c1, 3, &xSensorsTask);
+//  BaseType_t task2 = xTaskCreate(FlightControllerTask, "flightControllerTask", 256, NULL, 3, &xFlightControllerTask);
+
+  if(task1 != pdPASS){
+	  trace_puts("task1fail");
+  }
+//  if(task2 != pdPASS){
+//  	  trace_puts("task1fail");
+//    }
+
 //  xTaskCreate(CommunicationTask, "communicationTask", 128, &huart1, 4, xCommTask);
+
 
 //  Wifi_Init(osPriorityNormal, &huart1);
   /* add threads, ... */
@@ -161,6 +177,7 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
+  sensorDataQueue = xQueueCreate(10, sizeof(SensorData*));
   /* USER CODE END RTOS_QUEUES */
 
   trace_puts("test");

@@ -5,4 +5,11 @@
  *      Author: gege3
  */
 
+#include "tasks/flightcontroller.h"
 
+void FlightControllerTask(void* const arguments){
+
+	for(;;){
+
+	}
+}

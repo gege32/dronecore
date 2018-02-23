@@ -12,8 +12,12 @@
 #include "cmsis_os.h"
 #include "semihosting/Trace.h"
 #include "sensordriver/mpu6050.h"
+#include "datamodels.h"
+#include "arm_math.h"
 
 SemaphoreHandle_t dataReady;
+
+extern QueueHandle_t sensorDataQueue;
 
 void SensorMeasurementTask(void const* argument);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);

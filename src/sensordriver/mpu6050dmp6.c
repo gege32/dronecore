@@ -495,12 +495,18 @@ void mpu6050_dmpDisable() {
 /*
  * get quaternion from packet
  */
-void mpu6050_getQuaternion(const uint8_t* packet, double *qw, double *qx, double *qy, double *qz) {
+void mpu6050_getQuaternion(const uint8_t* packet, q31_t *datawxyz) {
 	if (packet == 0) packet = dmpPacketBuffer;
-    *qw = (double)((packet[0] << 8) + packet[1]) / 16384.0f;
-    *qx = (double)((packet[4] << 8) + packet[5]) / 16384.0f;
-    *qy = (double)((packet[8] << 8) + packet[9]) / 16384.0f;
-    *qz = (double)((packet[12] << 8) + packet[13]) / 16384.0f;
+	float32_t temp [4];
+    temp[0] = (float32_t)(((uint32_t)packet[0] << 24) | ((uint32_t)packet[1] << 16) | ((uint32_t)packet[2] << 8) | packet[3]) / 1073741824.0f;
+    temp[1] = (float32_t)(((uint32_t)packet[4] << 24) | ((uint32_t)packet[5] << 16) | ((uint32_t)packet[6] << 8) | packet[7]) / 1073741824.0f;
+    temp[2] = (float32_t)(((uint32_t)packet[8] << 24) | ((uint32_t)packet[9] << 16) | ((uint32_t)packet[10] << 8) | packet[11])/ 1073741824.0f;
+    temp[3] = (float32_t)(((uint32_t)packet[12] << 24) | ((uint32_t)packet[13] << 16) | ((uint32_t)packet[14] << 8) | packet[15])/ 1073741824.0f;
+
+    arm_float_to_q31(temp, datawxyz, 4);
+
+
+    free(temp);
 }
 
 /*
@@ -510,7 +516,7 @@ void mpu6050_getQuaternion(const uint8_t* packet, double *qw, double *qx, double
  * 2. rotate around sensor Y plane by pitch
  * 3. rotate around sensor X plane by roll
  */
-void mpu6050_getRollPitchYaw(double qw, double qx, double qy, double qz, double *roll, double *pitch, double *yaw) {
+void mpu6050_getRollPitchYaw(float32_t qw, float32_t qx, float32_t qy, float32_t qz, float32_t *roll, float32_t *pitch, float32_t *yaw) {
 	*yaw = atan2(2*qx*qy - 2*qw*qz, 2*qw*qw + 2*qx*qx - 1);
 	*pitch = -asin(2*qx*qz + 2*qw*qy);
 	*roll = atan2(2*qy*qz - 2*qw*qx, 2*qw*qw + 2*qz*qz - 1);
@@ -519,7 +525,7 @@ void mpu6050_getRollPitchYaw(double qw, double qx, double qy, double qz, double 
 /*
  * get quaternion and wait
  */
-uint8_t mpu6050_getQuaternionWait(double *qw, double *qx, double *qy, double *qz) {
+uint8_t mpu6050_getQuaternionWait(q31_t *datawxyz) {
 	//check for overflow
 	mpu6050_mpuIntStatus = mpu6050_getIntStatus();
 	mpu6050_fifoCount = mpu6050_getFIFOCount();
@@ -540,7 +546,7 @@ uint8_t mpu6050_getQuaternionWait(double *qw, double *qx, double *qy, double *qz
 		mpu6050_getFIFOBytes(mpu6050_fifoBuffer, MPU6050_DMP_dmpPacketSize);
 		mpu6050_fifoCount -= MPU6050_DMP_dmpPacketSize;
 		//get quaternion
-		mpu6050_getQuaternion(mpu6050_fifoBuffer, qw, qx, qy, qz);
+		mpu6050_getQuaternion(mpu6050_fifoBuffer, datawxyz);
 		return 1;
 }
 
