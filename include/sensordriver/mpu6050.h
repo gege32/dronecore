@@ -92,7 +92,7 @@ References:
 #if MPU6050_GETATTITUDE == 2
 //dmp definitions
 //packet size
-#define MPU6050_DMP_dmpPacketSize 42
+#define MPU6050_DMP_dmpPacketSize 36
 //define INT0 rise edge interrupt
 #define MPU6050_DMP_INT0SETUP EICRA |= (1<<ISC01) | (1<<ISC00)
 //define enable and disable INT0 rise edge interrupt

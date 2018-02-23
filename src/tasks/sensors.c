@@ -45,7 +45,21 @@ void SensorMeasurementTask(void const* argument){
     HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
-    int i = 0;
+//    float32_t test = 0.5f;
+//    q31_t dest;
+//    int32_t test2 = 0xff;
+//    q31_t test_q = (q31_t)test2;
+//    float32_t test3;
+//    arm_q31_to_float(&test_q, &test3, 1);
+//	arm_float_to_q31(&test, &dest, 1);
+//    arm_add_q31(&dest, &test2, &test_q, 1);
+//
+//    arm_q31_to_float(&test_q, &test, 1);
+//
+//    snprintf(szoveg, 10, "%.6f", test);
+
+    uint8_t i = 0;
+    float32_t data_f [4];
 
 	for(;;){
 
@@ -57,9 +71,10 @@ void SensorMeasurementTask(void const* argument){
 		  arm_sub_q31(data, data2, temp, 4);
 		  arm_abs_q31(temp, temp, 4);
 
-	      if((temp[0] > 0.01) || (temp[1] > 0.01) || (temp[2] > 0.01) || (temp[3]  > 0.01)){
+	      if((temp[0] > 100000) || (temp[1] > 100000) || (temp[2] > 100000) || (temp[3]  > 100000)){
 //	    	  snprintf(szoveg, 70, "qw:%f,qx:%f,qy:%f,qz:%f,roll:%fpitch:%f,yaw:%f", qw, qx, qy, qz, roll, pitch, yaw);
-	    	  snprintf(szoveg, 70, "qw:%i,qx:%i,qy:%i,qz:%i", data[0], data[1], data[2], data[3]);
+	    	  arm_q31_to_float(data, data_f, 4);
+	    	  snprintf(szoveg, 70, "qw:%.7f,qx:%.7f,qy:%.7f,qz:%.7f", data_f[0], data_f[1], data_f[2], data_f[3]);
 	    	  trace_puts(szoveg);
 	      }
 	      for(i = 0; i<4; i++){

@@ -497,16 +497,11 @@ void mpu6050_dmpDisable() {
  */
 void mpu6050_getQuaternion(const uint8_t* packet, q31_t *datawxyz) {
 	if (packet == 0) packet = dmpPacketBuffer;
-	float32_t temp [4];
-    temp[0] = (float32_t)(((uint32_t)packet[0] << 24) | ((uint32_t)packet[1] << 16) | ((uint32_t)packet[2] << 8) | packet[3]) / 1073741824.0f;
-    temp[1] = (float32_t)(((uint32_t)packet[4] << 24) | ((uint32_t)packet[5] << 16) | ((uint32_t)packet[6] << 8) | packet[7]) / 1073741824.0f;
-    temp[2] = (float32_t)(((uint32_t)packet[8] << 24) | ((uint32_t)packet[9] << 16) | ((uint32_t)packet[10] << 8) | packet[11])/ 1073741824.0f;
-    temp[3] = (float32_t)(((uint32_t)packet[12] << 24) | ((uint32_t)packet[13] << 16) | ((uint32_t)packet[14] << 8) | packet[15])/ 1073741824.0f;
 
-    arm_float_to_q31(temp, datawxyz, 4);
-
-
-    free(temp);
+	datawxyz[0] = (q31_t) (((uint32_t)packet[0] << 24) | ((uint32_t)packet[1] << 16) | ((uint32_t)packet[2] << 8) | packet[3]);
+	datawxyz[1] = (q31_t) (((uint32_t)packet[4] << 24) | ((uint32_t)packet[5] << 16) | ((uint32_t)packet[6] << 8) | packet[7]);
+	datawxyz[2] = (q31_t) (((uint32_t)packet[8] << 24) | ((uint32_t)packet[9] << 16) | ((uint32_t)packet[10] << 8) | packet[11]);
+	datawxyz[3] = (q31_t) (((uint32_t)packet[12] << 24) | ((uint32_t)packet[13] << 16) | ((uint32_t)packet[14] << 8) | packet[15]);
 }
 
 /*
