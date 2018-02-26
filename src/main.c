@@ -125,6 +125,7 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
+  char temp [10];
 
   /* USER CODE BEGIN SysInit */
 
@@ -158,15 +159,18 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  BaseType_t task1 = xTaskCreate(SensorMeasurementTask, "sensorTask", 256, &hi2c1, 3, &xSensorsTask);
-//  BaseType_t task2 = xTaskCreate(FlightControllerTask, "flightControllerTask", 256, NULL, 3, &xFlightControllerTask);
+  BaseType_t task1 = xTaskCreate(SensorMeasurementTask, "sensorTask", 256, &hi2c1, 5, &xSensorsTask);
+  BaseType_t task2 = xTaskCreate(FlightControllerTask, "flightControllerTask", 256, NULL, 5, &xFlightControllerTask);
 
   if(task1 != pdPASS){
 	  trace_puts("task1fail");
   }
-//  if(task2 != pdPASS){
-//  	  trace_puts("task1fail");
-//    }
+  if(task2 != pdPASS){
+  	  trace_puts("task2fail");
+    }
+
+  unsigned char test [] = "test";
+  HAL_UART_Transmit(&huart1, test, 4, 10);
 
 //  xTaskCreate(CommunicationTask, "communicationTask", 128, &huart1, 4, xCommTask);
 
@@ -180,7 +184,11 @@ int main(void)
   sensorDataQueue = xQueueCreate(10, sizeof(SensorData*));
   /* USER CODE END RTOS_QUEUES */
 
-  trace_puts("test");
+  snprintf(temp, 10, "%i", SystemCoreClock);
+  trace_puts(temp);
+  size_t freeHeap = xPortGetFreeHeapSize();
+  snprintf(temp, 10, "%i", freeHeap);
+  trace_puts(temp);
   /* Start scheduler */
   osKernelStart();
 
@@ -314,7 +322,7 @@ static void MX_USART1_UART_Init(void)
 {
 
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
+  huart1.Init.BaudRate = 57600;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;

@@ -4,10 +4,11 @@
 //#######################################################################################
 void	Wifi_UserInit(void)
 {
-	Wifi_SetMode(WifiMode_Station);
-  //Wifi_SetMode(WifiMode_SoftAp); 
+//	Wifi_SetMode(WifiMode_Station);
+  Wifi_SetMode(WifiMode_SoftAp);
 
-  while (Wifi_Station_ConnectToAp("L70_9587","33559366",NULL) == false);
+//  while (Wifi_Station_ConnectToAp("L70_9587","33559366",NULL) == false);
+  Wifi_SoftAp_Create("TEST", "", 2, WifiEncryptionType_Open, 2, FALSE);
  
     
 }
@@ -19,7 +20,7 @@ void  Wifi_UserProcess(void)
   {    
     if(last!=1)
 	{
-        Wifi_Station_ConnectToAp("Fostartaly", "q1e3tw2r4", "00:11:22:33:44:55");
+        Wifi_SoftAp_Create("TEST", "", 2, WifiEncryptionType_Open, 2, FALSE);
 	}
     last=1;
   }
@@ -27,7 +28,7 @@ void  Wifi_UserProcess(void)
   {   
     if(last!=2)
     {
-      Wifi_TcpIp_StartTcpConnection(0,Wifi.MyGateWay,33333,10);
+//      Wifi_TcpIp_StartTcpConnection(0,Wifi.MyGateWay,33333,10);
     }
     last=2;
   }

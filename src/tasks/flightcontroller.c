@@ -9,7 +9,19 @@
 
 void FlightControllerTask(void* const arguments){
 
+	trace_puts("initFC");
+	SensorData buffer;
+	BaseType_t newMessage;
+
 	for(;;){
+
+
+		newMessage = xQueueReceive(sensorDataQueue, &buffer, 50);
+		if(newMessage == pdTRUE){
+			trace_puts("newMSG");
+		}
+
+
 
 	}
 }
