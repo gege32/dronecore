@@ -152,7 +152,7 @@ extern uint8_t mpu6050_dmpInitialize();
 extern void mpu6050_dmpEnable();
 extern void mpu6050_dmpDisable();
 extern void mpu6050_getQuaternion(const uint8_t* packet, q31_t *datawxyz);
-extern void mpu6050_getRollPitchYaw(float32_t qw, float32_t qx, float32_t qy, float32_t qz, float32_t *roll, float32_t *pitch, float32_t *yaw);
+extern void mpu6050_getRollPitchYaw(q31_t *datawxyz, float32_t *rpy);
 extern uint8_t mpu6050_getQuaternionWait(q31_t *datawxyz);
 #endif
 

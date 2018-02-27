@@ -17,7 +17,7 @@ void SensorMeasurementTask(void const* argument){
 	mpu6050_init((I2C_HandleTypeDef*)argument);
 	osDelay(250);
 
-	char szoveg [70];
+	char szoveg [40];
 
     GPIO_InitTypeDef gpio;
     gpio.Pin = GPIO_PIN_13;
@@ -43,19 +43,18 @@ void SensorMeasurementTask(void const* argument){
     HAL_NVIC_SetPriority(EXTI9_5_IRQn, 8, 0);
     HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
-    uint8_t i = 0;
-    float32_t data_f [4];
+    float32_t data_f [3];
 
 	for(;;){
 
 //		xSemaphoreTake(dataReady, portMAX_DELAY);
 
 		  mpu6050_getQuaternionWait(data);
-//	      mpu6050_getRollPitchYaw(qw, qx, qy, qz, &roll, &pitch, &yaw);
+	      mpu6050_getRollPitchYaw(data, data_f);
 
-	    	  arm_q31_to_float(data, data_f, 4);
-	    	  snprintf(szoveg, 70, "qw:%.7f,qx:%.7f,qy:%.7f,qz:%.7f\r\n", data_f[0], data_f[1], data_f[2], data_f[3]);
-	    	  HAL_UART_Transmit(&huart1, data, 70, 20);
+//	    	  arm_q31_to_float(rpy, data_f, 3);
+	    	  snprintf(szoveg, 40, "r:%.7f,p:%.7f,y:%.7f\r\n", data_f[0], data_f[1], data_f[2]);
+	    	  HAL_UART_Transmit(&huart1, szoveg, 40, 20);
 	}
 
 }
