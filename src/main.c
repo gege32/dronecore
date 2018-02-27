@@ -66,6 +66,8 @@ I2C_HandleTypeDef hi2c1;
 
 UART_HandleTypeDef huart1;
 
+UART_HandleTypeDef husart2;
+
 TIM_HandleTypeDef htim2;
 
 osThreadId defaultTaskHandle;
@@ -90,6 +92,7 @@ static void MX_I2C1_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_USART2_Init(void);
 void StartDefaultTask(void const * argument);
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
@@ -136,6 +139,7 @@ int main(void)
   MX_I2C1_Init();
   MX_ADC1_Init();
   MX_USART1_UART_Init();
+  MX_USART2_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
@@ -175,7 +179,7 @@ int main(void)
 //  xTaskCreate(CommunicationTask, "communicationTask", 128, &huart1, 4, xCommTask);
 
 
-//  Wifi_Init(osPriorityNormal, &huart1);
+  Wifi_Init(osPriorityNormal, &husart2);
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
@@ -322,7 +326,7 @@ static void MX_USART1_UART_Init(void)
 {
 
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 57600;
+  huart1.Init.BaudRate = 115200;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
@@ -330,6 +334,25 @@ static void MX_USART1_UART_Init(void)
   huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart1.Init.OverSampling = UART_OVERSAMPLING_16;
   if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
+/* USART2 init function */
+static void MX_USART2_Init(void)
+{
+
+  husart2.Instance = USART2;
+  husart2.Init.BaudRate = 115200;
+  husart2.Init.WordLength = UART_WORDLENGTH_8B;
+  husart2.Init.StopBits = UART_STOPBITS_1;
+  husart2.Init.Parity = UART_PARITY_NONE;
+  husart2.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&husart2) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
