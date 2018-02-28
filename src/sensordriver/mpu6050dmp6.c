@@ -23,7 +23,7 @@ Please refer to LICENSE file for licensing information.
 #include <math.h>  //include libm
 
 #define MPU6050_DMP_CODE_SIZE 3062
-#define MPU6050_DMP_CONFIG_SIZE 42
+#define MPU6050_DMP_CONFIG_SIZE 57
 #define MPU6050_DMP_UPDATES_SIZE 47
 
 volatile uint8_t mpu6050_mpuInterrupt = 0;
@@ -255,48 +255,14 @@ const uint8_t mpu6050_dmpMemory[MPU6050_DMP_CODE_SIZE] __attribute__((section ("
 
 const uint8_t mpu6050_dmpConfig[MPU6050_DMP_CONFIG_SIZE] __attribute__((section (".USER_FLASH"))) = {
 //  BANK    OFFSET  LENGTH  [DATA]
-//    0x03,   0x7B,   0x03,   0x4C, 0xCD, 0x6C,         // FCFG_1 inv_set_gyro_calibration
       0x04,   0x26,   0x03,   0x4C, 0xCD, 0x6C,         //gyro orientation
       0x04,   0x2A,   0x03,   0x0C, 0xC9, 0x2C,         //accel orietation
-      0x04,   0x40,   0x03,   0x36, 0x56, 0x76,         // orientation gyro signs
-      0x04,   0x31,   0x03,   0x26, 0x46, 0x66,         // orientation gyro signs
-//    0x00,   0x68,   0x04,   0x02, 0xCB, 0x47, 0xA2,   // D_0_104 inv_set_gyro_calibration
-//    0x02,   0x18,   0x04,   0x00, 0x05, 0x8B, 0xC1,   // D_0_24 inv_set_gyro_calibration
-//    0x01,   0x0C,   0x04,   0x00, 0x00, 0x00, 0x00,   // D_1_152 inv_set_accel_calibration
-//    0x03,   0x7F,   0x06,   0x0C, 0xC9, 0x2C, 0x97, 0x97, 0x97, // FCFG_2 inv_set_accel_calibration
-//    0x03,   0x89,   0x03,   0x26, 0x46, 0x66,         // FCFG_7 inv_set_accel_calibration
-//    0x00,   0x6C,   0x02,   0x20, 0x00,               // D_0_108 inv_set_accel_calibration
-//    0x02,   0x40,   0x04,   0x00, 0x00, 0x00, 0x00,   // CPASS_MTX_00 inv_set_compass_calibration
-//    0x02,   0x44,   0x04,   0x00, 0x00, 0x00, 0x00,   // CPASS_MTX_01
-//    0x02,   0x48,   0x04,   0x00, 0x00, 0x00, 0x00,   // CPASS_MTX_02
-//    0x02,   0x4C,   0x04,   0x00, 0x00, 0x00, 0x00,   // CPASS_MTX_10
-//    0x02,   0x50,   0x04,   0x00, 0x00, 0x00, 0x00,   // CPASS_MTX_11
-//    0x02,   0x54,   0x04,   0x00, 0x00, 0x00, 0x00,   // CPASS_MTX_12
-//    0x02,   0x58,   0x04,   0x00, 0x00, 0x00, 0x00,   // CPASS_MTX_20
-//    0x02,   0x5C,   0x04,   0x00, 0x00, 0x00, 0x00,   // CPASS_MTX_21
-//    0x02,   0xBC,   0x04,   0x00, 0x00, 0x00, 0x00,   // CPASS_MTX_22
-//    0x01,   0xEC,   0x04,   0x00, 0x00, 0x40, 0x00,   // D_1_236 inv_apply_endian_accel
-//    0x03,   0x7F,   0x06,   0x0C, 0xC9, 0x2C, 0x97, 0x97, 0x97, // FCFG_2 inv_set_mpu_sensors
-//    0x04,   0x02,   0x03,   0x0D, 0x35, 0x5D,         // CFG_MOTION_BIAS inv_turn_on_bias_from_no_motion
-      0x04,   0x09,   0x04,   0x87, 0x2D, 0x35, 0x3D,   // FCFG_5 inv_set_bias_update
-//      0x00,   0xA3,   0x01,   0x00,                     // D_0_163 inv_set_dead_zone
-                 // SPECIAL 0x01 = enable interrupts
-//      0x00,   0x00,   0x00,   0x01, // SET INT_ENABLE at i=22, SPECIAL INSTRUCTION
-      0x07,   0x86,   0x01,   0xFE,                     // CFG_6 inv_set_fifo_interupt
-//    0x07,   0x41,   0x05,   0xF1, 0x20, 0x28, 0x30, 0x38, // CFG_8 inv_send_quaternion
+      0x04,   0x40,   0x03,   0x37, 0x57, 0x76,         // orientation gyro signs
+      0x04,   0x31,   0x03,   0x27, 0x47, 0x66,         // orientation gyro signs
+	  0x04,   0xb8,   0x09,   0xb8, 0xaa, 0xb3, 0x8d, 0xb4, 0x98, 0x0d, 0x35, 0x5d,         // CFG_MOTION_BIAS calibrate gyro data
+	  0x0A,   0x82,   0x0B,   0xd8, 0xb1, 0xb9, 0xf3, 0x8b, 0xa3, 0x91, 0xb6, 0x09, 0xb4, 0xd9,                     // CFG_FIFO_ON_EVENT inv_set_fifo_interupt
 	  0x07,   0x9e,   0x04,   0x20, 0x28, 0x30, 0x38, // CFG_8 inv_send_quaternion
-//    0x07,   0x7E,   0x01,   0x30,                     // CFG_16 inv_set_footer
-//    0x07,   0x46,   0x01,   0x9A,                     // CFG_GYRO_SOURCE inv_send_gyro
-//    0x07,   0x47,   0x04,   0xF1, 0x28, 0x30, 0x38,   // CFG_9 inv_send_gyro -> inv_construct3_fifo
-//    0x07,   0x6C,   0x04,   0xF1, 0x28, 0x30, 0x38,   // CFG_12 inv_send_accel -> inv_construct3_fifo
-//    0x02,   0x16,   0x02,   0x00, 0x01                // D_0_22 inv_set_fifo_rate
 
-    // This very last 0x01 WAS a 0x09, which drops the FIFO rate down to 20 Hz. 0x07 is 25 Hz,
-    // 0x01 is 100Hz. Going faster than 100Hz (0x00=200Hz) tends to result in very noisy data.
-    // DMP output frequency is calculated easily using this equation: (200Hz / (1 + value))
-
-    // It is important to make sure the host processor can keep up with reading and processing
-    // the FIFO output at the desired rate. Handling FIFO overflow cleanly is also a good idea.
 };
 
 const uint8_t mpu6050_dmpUpdates[MPU6050_DMP_UPDATES_SIZE] __attribute__((section (".USER_FLASH")))= {
@@ -499,15 +465,21 @@ void mpu6050_dmpDisable() {
 /*
  * get quaternion from packet
  */
-void mpu6050_getQuaternion(const uint8_t* packet, q31_t *datawxyz) {
+void mpu6050_getQuaternion(const uint8_t* packet, q31_t *datawxyz, int32_t* temp_i) {
 	if (packet == 0) packet = dmpPacketBuffer;
-	float32_t temp [4];
-	temp[0] = ((float32_t)(((int32_t)packet[0] << 24) | ((int32_t)packet[1] << 16) | ((int32_t)packet[2] << 8) | packet[3]) / 1073741824.0f);
-	temp[1] = ((float32_t)(((int32_t)packet[4] << 24) | ((int32_t)packet[5] << 16) | ((int32_t)packet[6] << 8) | packet[7]) / 1073741824.0f);
-	temp[2] = ((float32_t)(((int32_t)packet[8] << 24) | ((int32_t)packet[9] << 16) | ((int32_t)packet[10] << 8) | packet[11]) / 1073741824.0f);
-	temp[3] = ((float32_t)(((int32_t)packet[12] << 24) | ((int32_t)packet[13] << 16) | ((int32_t)packet[14] << 8) | packet[15]) / 1073741824.0f);
+	float32_t temp_f [4];
 
-	arm_float_to_q31(temp, datawxyz, 4);
+	temp_i[0] = (((uint32_t)packet[0] << 24) | ((uint32_t)packet[1] << 16) | ((uint32_t)packet[2] << 8) | packet[3]);
+	temp_i[1] = (((uint32_t)packet[4] << 24) | ((uint32_t)packet[5] << 16) | ((uint32_t)packet[6] << 8) | packet[7]);
+	temp_i[2] = (((uint32_t)packet[8] << 24) | ((uint32_t)packet[9] << 16) | ((uint32_t)packet[10] << 8) | packet[11]);
+	temp_i[3] = (((uint32_t)packet[12] << 24) | ((uint32_t)packet[13] << 16) | ((uint32_t)packet[14] << 8) | packet[15]);
+
+	temp_f[0] = (float32_t)(temp_i[0] / 1073741824.0f);
+	temp_f[1] = (float32_t)(temp_i[1] / 1073741824.0f);
+	temp_f[2] = (float32_t)(temp_i[2] / 1073741824.0f);
+	temp_f[3] = (float32_t)(temp_i[3] / 1073741824.0f);
+
+	arm_float_to_q31(temp_f, datawxyz, 4);
 }
 
 /*
@@ -540,14 +512,14 @@ void mpu6050_getRollPitchYaw(q31_t *datawxyz, float32_t *rpy) {
     arm_mult_q31(datawxyz+1, datawxyz+2, mixed_q+5, 1);
     arm_q31_to_float(mixed_q, mixed_f, 6);
 
-    //roll
-    rpy[0] = (float32_t)atan2(2*(mixed_f[0] + mixed_f[1]), 1 - 2*(squares_f[1] + squares_f[2]));
+    //roll / bank
+    rpy[0] = (float32_t)atan2(2*(mixed_f[0] - mixed_f[1]), 1 - 2*(squares_f[1] + squares_f[3]));
 
-    //pitch
-    rpy[1] = (float32_t)-asin(2*(mixed_f[2] - mixed_f[3]));
+    //pitch / attitude
+    rpy[1] = (float32_t)-asin(2*(mixed_f[5] + mixed_f[4]));
 
-    //yaw
-    rpy[2] = (float32_t)atan2(2*(mixed_f[4] + mixed_f[5]), 1 - 2*(squares_f[2] + squares_f[3]));
+    //yaw /heading
+    rpy[2] = (float32_t)atan2(2*(mixed_f[2] - mixed_f[3]), 1 - 2*(squares_f[2] + squares_f[3]));
 
 //	arm_float_to_q31(temp2, rpy, 3);
 }
@@ -574,7 +546,8 @@ uint8_t mpu6050_getQuaternionWait(q31_t *datawxyz) {
 		//read a packet from FIFO
 		mpu6050_getFIFOBytes(mpu6050_fifoBuffer, MPU6050_DMP_dmpPacketSize);
 		//get quaternion
-		mpu6050_getQuaternion(mpu6050_fifoBuffer, datawxyz);
+		int32_t temp_i [4];
+		mpu6050_getQuaternion(mpu6050_fifoBuffer, datawxyz, temp_i);
 
 //		trace_puts(mpu6050_fifoBuffer);
 

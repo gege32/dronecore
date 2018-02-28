@@ -44,7 +44,7 @@ void SensorMeasurementTask(void const* argument){
     HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
     float32_t data_f [3];
-    uint8_t data_int[4];
+    int8_t data_int[4];
 
 	for(;;){
 
@@ -56,10 +56,10 @@ void SensorMeasurementTask(void const* argument){
 //	    	  arm_q31_to_float(rpy, data_f, 3);
 	    	  snprintf(szoveg, 40, "r:%.7f,p:%.7f,y:%.7f\r\n", data_f[0], data_f[1], data_f[2]);
 
-//	    	  data_int[0] = (uint8_t)(data_f[2] * (180 / M_PI));
-//	    	  data_int[1] = ((uint8_t)(data_f[2] * (180 / M_PI))) >> 8;
-//	    	  data_int[2] = (uint8_t)(data_f[1] * (180 / M_PI));
-//	    	  data_int[3] = (uint8_t)(data_f[0] * (180 / M_PI));
+//	    	  data_int[0] = (int8_t)(data_f[2] * (180 / M_PI));
+//	    	  data_int[1] = ((int8_t)(data_f[2] * (180 / M_PI))) >> 8;
+//	    	  data_int[2] = (int8_t)(data_f[1] * (180 / M_PI));
+//	    	  data_int[3] = (int8_t)(data_f[0] * (180 / M_PI));
 
 	    	  HAL_UART_Transmit(&huart1, szoveg, 40, 20);
 //	    	  trace_puts(szoveg);

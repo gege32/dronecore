@@ -151,7 +151,7 @@ extern void mpu6050_setZGyroOffset(int8_t offset);
 extern uint8_t mpu6050_dmpInitialize();
 extern void mpu6050_dmpEnable();
 extern void mpu6050_dmpDisable();
-extern void mpu6050_getQuaternion(const uint8_t* packet, q31_t *datawxyz);
+extern void mpu6050_getQuaternion(const uint8_t* packet, q31_t *datawxyz, int32_t* temp_i);
 extern void mpu6050_getRollPitchYaw(q31_t *datawxyz, float32_t *rpy);
 extern uint8_t mpu6050_getQuaternionWait(q31_t *datawxyz);
 #endif
