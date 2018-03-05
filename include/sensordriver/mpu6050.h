@@ -73,9 +73,9 @@ References:
 #define MPU6050_AXGAIN 16384.0
 #define MPU6050_AYGAIN 16384.0
 #define MPU6050_AZGAIN 16384.0
-#define MPU6050_GXOFFSET -42
-#define MPU6050_GYOFFSET 9
-#define MPU6050_GZOFFSET -29
+#define MPU6050_GXOFFSET 0
+#define MPU6050_GYOFFSET 0
+#define MPU6050_GZOFFSET 0
 #define MPU6050_GXGAIN 16.4
 #define MPU6050_GYGAIN 16.4
 #define MPU6050_GZGAIN 16.4
@@ -92,7 +92,7 @@ References:
 #if MPU6050_GETATTITUDE == 2
 //dmp definitions
 //packet size
-#define MPU6050_DMP_dmpPacketSize 36
+#define MPU6050_DMP_dmpPacketSize 24
 //define INT0 rise edge interrupt
 #define MPU6050_DMP_INT0SETUP EICRA |= (1<<ISC01) | (1<<ISC00)
 //define enable and disable INT0 rise edge interrupt

@@ -24,7 +24,7 @@ Please refer to LICENSE file for licensing information.
 
 #define MPU6050_DMP_CODE_SIZE 3062
 #define MPU6050_DMP_CONFIG_SIZE 57
-#define MPU6050_DMP_UPDATES_SIZE 47
+//#define MPU6050_DMP_UPDATES_SIZE 47
 
 volatile uint8_t mpu6050_mpuInterrupt = 0;
 uint8_t *dmpPacketBuffer;
@@ -258,22 +258,22 @@ const uint8_t mpu6050_dmpConfig[MPU6050_DMP_CONFIG_SIZE] __attribute__((section 
       0x04,   0x26,   0x03,   0x4C, 0xCD, 0x6C,         //gyro orientation
       0x04,   0x2A,   0x03,   0x0C, 0xC9, 0x2C,         //accel orietation
       0x04,   0x40,   0x03,   0x37, 0x57, 0x76,         // orientation gyro signs
-      0x04,   0x31,   0x03,   0x27, 0x47, 0x66,         // orientation gyro signs
+      0x04,   0x31,   0x03,   0x27, 0x47, 0x66,         // orientation accel signs
 	  0x04,   0xb8,   0x09,   0xb8, 0xaa, 0xb3, 0x8d, 0xb4, 0x98, 0x0d, 0x35, 0x5d,         // CFG_MOTION_BIAS calibrate gyro data
 	  0x0A,   0x82,   0x0B,   0xd8, 0xb1, 0xb9, 0xf3, 0x8b, 0xa3, 0x91, 0xb6, 0x09, 0xb4, 0xd9,                     // CFG_FIFO_ON_EVENT inv_set_fifo_interupt
 	  0x07,   0x9e,   0x04,   0x20, 0x28, 0x30, 0x38, // CFG_8 inv_send_quaternion
 
 };
 
-const uint8_t mpu6050_dmpUpdates[MPU6050_DMP_UPDATES_SIZE] __attribute__((section (".USER_FLASH")))= {
-    0x01,   0xB2,   0x02,   0xFF, 0xFF,
-    0x01,   0x90,   0x04,   0x09, 0x23, 0xA1, 0x35,
-    0x01,   0x6A,   0x02,   0x06, 0x00,
-    0x01,   0x60,   0x08,   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00,   0x60,   0x04,   0x40, 0x00, 0x00, 0x00,
-    0x01,   0x62,   0x02,   0x00, 0x00,
-    0x00,   0x60,   0x04,   0x00, 0x40, 0x00, 0x00
-};
+//const uint8_t mpu6050_dmpUpdates[MPU6050_DMP_UPDATES_SIZE] __attribute__((section (".USER_FLASH")))= {
+//    0x01,   0xB2,   0x02,   0xFF, 0xFF,
+//    0x01,   0x90,   0x04,   0x09, 0x23, 0xA1, 0x35,
+//    0x01,   0x6A,   0x02,   0x06, 0x00,
+//    0x01,   0x60,   0x08,   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+//    0x00,   0x60,   0x04,   0x40, 0x00, 0x00, 0x00,
+//    0x01,   0x62,   0x02,   0x00, 0x00,
+//    0x00,   0x60,   0x04,   0x00, 0x40, 0x00, 0x00
+//};
 
 /*
  * initialize mpu6050 dmp
@@ -290,10 +290,10 @@ uint8_t mpu6050_dmpInitialize() {
     //set memorybank to 0
     mpu6050_setMemoryBank(0, 0, 0);
 
-    //get X/Y/Z gyro offsets
-    int8_t xgOffset = mpu6050_getXGyroOffset();
-    int8_t ygOffset = mpu6050_getYGyroOffset();
-    int8_t zgOffset = mpu6050_getZGyroOffset();
+//    //get X/Y/Z gyro offsets
+//    int8_t xgOffset = mpu6050_getXGyroOffset();
+//    int8_t ygOffset = mpu6050_getYGyroOffset();
+//    int8_t zgOffset = mpu6050_getZGyroOffset();
 
     //setting slave 0 address to 0x7F
 	mpu6050_writeByte(MPU6050_RA_I2C_SLV0_ADDR + 0*3, 0x7F);
@@ -325,7 +325,7 @@ uint8_t mpu6050_dmpInitialize() {
             mpu6050_writeBits(MPU6050_RA_CONFIG, MPU6050_CFG_DLPF_CFG_BIT, MPU6050_CFG_DLPF_CFG_LENGTH, MPU6050_DLPF_BW_42);
 
             //set gyro sensitivity to +/- 2000 deg/sec
-            mpu6050_writeBits(MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, MPU6050_GYRO_FS_2000);
+//            mpu6050_writeBits(MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, MPU6050_GYRO_FS_2000);
 
             //set DMP configuration bytes (function unknown)
             mpu6050_writeByte(MPU6050_RA_DMP_CFG_1, 0x03);
@@ -337,26 +337,26 @@ uint8_t mpu6050_dmpInitialize() {
             //set X/Y/Z gyro offsets to previous values
             //xgOffset = 0;
             //ygOffset = 0;
-            zgOffset = 90;
+//            zgOffset = 90;
 
-            mpu6050_setXGyroOffset(xgOffset);
-            mpu6050_setYGyroOffset(ygOffset);
-            mpu6050_setZGyroOffset(zgOffset);
+//            mpu6050_setXGyroOffset(xgOffset);
+//            mpu6050_setYGyroOffset(ygOffset);
+//            mpu6050_setZGyroOffset(zgOffset);
 
             //set X/Y/Z gyro user offsets to zero
-            mpu6050_writeWords(MPU6050_RA_XG_OFFS_USRH, 1, 0);
-            mpu6050_writeWords(MPU6050_RA_YG_OFFS_USRH, 1, 0);
-            mpu6050_writeWords(MPU6050_RA_ZG_OFFS_USRH, 1, 0);
+//            mpu6050_writeWords(MPU6050_RA_XG_OFFS_USRH, 1, 0);
+//            mpu6050_writeWords(MPU6050_RA_YG_OFFS_USRH, 1, 0);
+//            mpu6050_writeWords(MPU6050_RA_ZG_OFFS_USRH, 1, 0);
 
-            //writing final memory update 1/7 (function unknown)
-            uint8_t dmpUpdate[16], j;
-            uint16_t pos = 0;
-            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
-            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
-
-            //writing final memory update 2/7 (function unknown)
-            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
-            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
+//            //writing final memory update 1/7 (function unknown)
+//            uint8_t dmpUpdate[16], j;
+//            uint16_t pos = 0;
+//            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
+//            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
+//
+//            //writing final memory update 2/7 (function unknown)
+//            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
+//            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
 
             //reset FIFO
             mpu6050_writeBits(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_FIFO_RESET_BIT, 1, 1);
@@ -400,34 +400,34 @@ uint8_t mpu6050_dmpInitialize() {
             //waiting for FIFO count > 2
             while ((fifoCount = mpu6050_getFIFOCount()) < 3);
 
-            //writing final memory update 3/7 (function unknown)
-            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
-            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
-
-            //writing final memory update 4/7 (function unknown)
-            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
-            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
-
-            //writing final memory update 5/7 (function unknown)
-            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
-            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
-
-            //reading FIFO data..."));
-            mpu6050_getFIFOBytes(fifoBuffer, fifoCount);
-
-            //reading final memory update 6/7 (function unknown)
-            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
-            mpu6050_readMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1]);
-
-            //waiting for FIFO count > 2
-            while ((fifoCount = mpu6050_getFIFOCount()) < 3);
-
-            //reading FIFO data
-            mpu6050_getFIFOBytes(fifoBuffer, fifoCount);
-
-            //writing final memory update 7/7 (function unknown)
-            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
-            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
+//            //writing final memory update 3/7 (function unknown)
+//            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
+//            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
+//
+//            //writing final memory update 4/7 (function unknown)
+//            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
+//            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
+//
+//            //writing final memory update 5/7 (function unknown)
+//            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
+//            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
+//
+//            //reading FIFO data..."));
+//            mpu6050_getFIFOBytes(fifoBuffer, fifoCount);
+//
+//            //reading final memory update 6/7 (function unknown)
+//            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
+//            mpu6050_readMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1]);
+//
+//            //waiting for FIFO count > 2
+//            while ((fifoCount = mpu6050_getFIFOCount()) < 3);
+//
+//            //reading FIFO data
+//            mpu6050_getFIFOBytes(fifoBuffer, fifoCount);
+//
+//            //writing final memory update 7/7 (function unknown)
+//            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
+//            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
 
             //disabling DMP (you turn it on later)
             mpu6050_dmpDisable();

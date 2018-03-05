@@ -54,7 +54,7 @@ void SensorMeasurementTask(void const* argument){
 	      mpu6050_getRollPitchYaw(data, data_f);
 
 //	    	  arm_q31_to_float(rpy, data_f, 3);
-	    	  snprintf(szoveg, 40, "r:%.7f,p:%.7f,y:%.7f\r\n", data_f[0], data_f[1], data_f[2]);
+	    	  snprintf(szoveg, 40, "r:%+.6f,p:%+.6f,y:%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
 
 //	    	  data_int[0] = (int8_t)(data_f[2] * (180 / M_PI));
 //	    	  data_int[1] = ((int8_t)(data_f[2] * (180 / M_PI))) >> 8;
