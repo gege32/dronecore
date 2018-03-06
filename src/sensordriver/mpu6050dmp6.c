@@ -23,7 +23,7 @@ Please refer to LICENSE file for licensing information.
 #include <math.h>  //include libm
 
 #define MPU6050_DMP_CODE_SIZE 3062
-#define MPU6050_DMP_CONFIG_SIZE 77
+#define MPU6050_DMP_CONFIG_SIZE 6+6+6+6+12+5+15+14+7/*+13*/
 //#define MPU6050_DMP_UPDATES_SIZE 47
 
 volatile uint8_t mpu6050_mpuInterrupt = 0;
@@ -257,13 +257,15 @@ const uint8_t mpu6050_dmpConfig[MPU6050_DMP_CONFIG_SIZE] __attribute__((section 
 //  BANK    OFFSET  LENGTH  [DATA]
       0x04,   0x26,   0x03,   0x4C, 0xCD, 0x6C,         //gyro orientation
       0x04,   0x2A,   0x03,   0x0C, 0xC9, 0x2C,         //accel orietation
-      0x04,   0x40,   0x03,   0x37, 0x57, 0x76,         // orientation gyro signs
-      0x04,   0x31,   0x03,   0x27, 0x47, 0x66,         // orientation accel signs
+      0x04,   0x40,   0x03,   0x36, 0x56, 0x76,         // orientation gyro signs
+      0x04,   0x31,   0x03,   0x26, 0x46, 0x66,         // orientation accel signs
 	  0x04,   0xb8,   0x09,   0xb8, 0xaa, 0xb3, 0x8d, 0xb4, 0x98, 0x0d, 0x35, 0x5d,         // CFG_MOTION_BIAS calibrate gyro data
-	  0x02,   0x16,   0x02,   0x00, 0x01,               //D_0_22 FIFO speed
+	  0x02,   0x16,   0x02,   0x00, 0x04,               //D_0_22 FIFO speed
 	  0x0A,   0xC1,   0x0C,   0xFE, 0XF2, 0xAB, 0xc4, 0xAA, 0xF1, 0xDF, 0xDF, 0xBB, 0xAF, 0xDF, 0xDF, //CFG_6 reason unknown, but is sets every time after fifo speed
 	  0x0A,   0x82,   0x0B,   0xd8, 0xb1, 0xb9, 0xf3, 0x8b, 0xa3, 0x91, 0xb6, 0x09, 0xb4, 0xd9,                     // CFG_FIFO_ON_EVENT inv_set_fifo_interupt
-	  0x07,   0x9e,   0x04,   0x20, 0x28, 0x30, 0x38, // CFG_8 inv_send_quaternion
+//	  0x0A,   0x9e,   0x04,   0x20, 0x28, 0x30, 0x38, // CFG_8 inv_send_quaternion
+	  0x0A,   0x98,   0x04,   0xC0, 0xC2, 0xC4, 0xC6, // CFG_LP_QUAT inv_send_quaternion (accel only)
+//	  0x0A,   0xA7,   0x0A,   0xA3, 0xC0, 0xC8, 0xc2, 0xc4, 0xcc, 0xC6, 0xA3, 0xA3, 0xA3, //CFG_15 send raw accel/gyro data
 
 };
 
@@ -297,14 +299,14 @@ uint8_t mpu6050_dmpInitialize() {
 //    int8_t ygOffset = mpu6050_getYGyroOffset();
 //    int8_t zgOffset = mpu6050_getZGyroOffset();
 
-    //setting slave 0 address to 0x7F
-	mpu6050_writeByte(MPU6050_RA_I2C_SLV0_ADDR + 0*3, 0x7F);
-	//disabling I2C Master mode
-	mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_I2C_MST_EN_BIT, 0);
-	//setting slave 0 address to 0x68 (self)
-	mpu6050_writeByte(MPU6050_RA_I2C_SLV0_ADDR + 0*3, 0x68);
-	//resetting I2C Master control
-	mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_I2C_MST_RESET_BIT, 1);
+//    //setting slave 0 address to 0x7F
+//	mpu6050_writeByte(MPU6050_RA_I2C_SLV0_ADDR + 0*3, 0x7F);
+//	//disabling I2C Master mode
+//	mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_I2C_MST_EN_BIT, 0);
+//	//setting slave 0 address to 0x68 (self)
+//	mpu6050_writeByte(MPU6050_RA_I2C_SLV0_ADDR + 0*3, 0x68);
+//	//resetting I2C Master control
+//	mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_I2C_MST_RESET_BIT, 1);
 	osDelay(20);
 
     //load DMP code into memory banks
@@ -312,35 +314,35 @@ uint8_t mpu6050_dmpInitialize() {
         if (mpu6050_writeDMPConfigurationSet(mpu6050_dmpConfig, MPU6050_DMP_CONFIG_SIZE, 1)) {
         	//set clock source
         	osDelay(10);
-        	mpu6050_writeBits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH, MPU6050_CLOCK_PLL_ZGYRO);
+//        	mpu6050_writeBits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH, MPU6050_CLOCK_PLL_ZGYRO);
 
-        	//set DMP and FIFO_OFLOW interrupts enabled
-        	mpu6050_writeByte(MPU6050_RA_INT_ENABLE, 0x13);
+        	//set DMP interrupts enabled
+        	mpu6050_writeByte(MPU6050_RA_INT_ENABLE, 0x02);
 
             //set sample rate
-        	mpu6050_writeByte(MPU6050_RA_SMPLRT_DIV, 9); // 1khz / (1 + 4) = 200 Hz
+//        	mpu6050_writeByte(MPU6050_RA_SMPLRT_DIV, 9); // 1khz / (1 + 4) = 200 Hz
 
             //set external frame sync to TEMP_OUT_L[0]
             mpu6050_writeBits(MPU6050_RA_CONFIG, MPU6050_CFG_EXT_SYNC_SET_BIT, MPU6050_CFG_EXT_SYNC_SET_LENGTH, MPU6050_EXT_SYNC_TEMP_OUT_L);
 
             //set DLPF bandwidth to 42Hz
-            mpu6050_writeBits(MPU6050_RA_CONFIG, MPU6050_CFG_DLPF_CFG_BIT, MPU6050_CFG_DLPF_CFG_LENGTH, MPU6050_DLPF_BW_42);
+//            mpu6050_writeBits(MPU6050_RA_CONFIG, MPU6050_CFG_DLPF_CFG_BIT, MPU6050_CFG_DLPF_CFG_LENGTH, MPU6050_DLPF_BW_42);
 
             //set gyro sensitivity to +/- 2000 deg/sec
 //            mpu6050_writeBits(MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, MPU6050_GYRO_FS_2000);
 
-            //set DMP configuration bytes (function unknown)
-            mpu6050_writeByte(MPU6050_RA_DMP_CFG_1, 0x03);
+            //set DMP configuration bytes/where the dmp program starts
+            mpu6050_writeByte(MPU6050_RA_DMP_CFG_1, 0x04);
             mpu6050_writeByte(MPU6050_RA_DMP_CFG_2, 0x00);
 
             //clear OTP Bank flag
             mpu6050_writeBit(MPU6050_RA_XG_OFFS_TC, MPU6050_TC_OTP_BNK_VLD_BIT, 0);
 
             //set X/Y/Z gyro offsets to previous values
-            //xgOffset = 0;
-            //ygOffset = 0;
+//            xgOffset = 0;
+//            ygOffset = 0;
 //            zgOffset = 90;
-
+//
 //            mpu6050_setXGyroOffset(xgOffset);
 //            mpu6050_setYGyroOffset(ygOffset);
 //            mpu6050_setZGyroOffset(zgOffset);
@@ -389,18 +391,16 @@ uint8_t mpu6050_dmpInitialize() {
             //reset FIFO
             mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_FIFO_RESET_BIT, 1);
 
-            mpu6050_writeByte(MPU6050_RA_FIFO_EN, 0x78);
-
             //enabling DMP
-            mpu6050_dmpEnable();
+//            mpu6050_dmpEnable();
 
             //resetting DMP
-            mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_DMP_RESET_BIT, 1);
+//            mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_DMP_RESET_BIT, 1);
 
-            osDelay(10);
+//            osDelay(10);
 
             //waiting for FIFO count > 2
-            while ((fifoCount = mpu6050_getFIFOCount()) < 3);
+//            while ((fifoCount = mpu6050_getFIFOCount()) < 3);
 
 //            //writing final memory update 3/7 (function unknown)
 //            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
@@ -432,7 +432,7 @@ uint8_t mpu6050_dmpInitialize() {
 //            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
 
             //disabling DMP (you turn it on later)
-            mpu6050_dmpDisable();
+//            mpu6050_dmpDisable();
 
             //resetting FIFO and clearing INT status one last time
             mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_FIFO_RESET_BIT, 1);
@@ -454,6 +454,8 @@ uint8_t mpu6050_dmpInitialize() {
 void mpu6050_dmpEnable() {
     mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_FIFO_EN_BIT, 1);
 	mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_DMP_EN_BIT, 1);
+	mpu6050_writeByte(MPU6050_RA_FIFO_EN, 0x00);
+	mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_DMP_RESET_BIT, 1);
 }
 
 /*
@@ -462,6 +464,7 @@ void mpu6050_dmpEnable() {
 void mpu6050_dmpDisable() {
     mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_FIFO_EN_BIT, 0);
 	mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_DMP_EN_BIT, 0);
+	mpu6050_writeByte(MPU6050_RA_FIFO_EN, 0x78);
 }
 
 /*
@@ -539,7 +542,6 @@ uint8_t mpu6050_getQuaternionWait(q31_t *datawxyz) {
 //	    while(!(mpu6050_getIntStatus() & 0x01)){
 //	        osDelay(1);
 //	    }
-	    mpu6050_fifoCount = mpu6050_getFIFOCount();
 		//wait for correct available data length, should be a VERY short wait
 		while (mpu6050_fifoCount < MPU6050_DMP_dmpPacketSize){
 			mpu6050_fifoCount = mpu6050_getFIFOCount();

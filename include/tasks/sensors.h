@@ -19,7 +19,7 @@ SemaphoreHandle_t dataReady;
 
 extern UART_HandleTypeDef huart1;
 
-extern TIM_HandleTypeDef htim4;
+extern TIM_HandleTypeDef htim3;
 
 extern QueueHandle_t sensorDataQueue;
 
