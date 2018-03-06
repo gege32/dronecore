@@ -19,6 +19,8 @@ SemaphoreHandle_t dataReady;
 
 extern UART_HandleTypeDef huart1;
 
+extern TIM_HandleTypeDef htim4;
+
 extern QueueHandle_t sensorDataQueue;
 
 void SensorMeasurementTask(void const* argument);
