@@ -141,19 +141,27 @@ extern uint16_t mpu6050_getFIFOCount();
 extern void mpu6050_getFIFOBytes(uint8_t *data, uint8_t length);
 extern uint8_t mpu6050_getIntStatus();
 extern void mpu6050_resetFIFO();
-extern int8_t mpu6050_getXGyroOffset();
-extern void mpu6050_setXGyroOffset(int8_t offset);
-extern int8_t mpu6050_getYGyroOffset();
-extern void mpu6050_setYGyroOffset(int8_t offset);
-extern int8_t mpu6050_getZGyroOffset();
-extern void mpu6050_setZGyroOffset(int8_t offset);
+
+int16_t mpu6050_getXGyroOffset();
+void mpu6050_setXGyroOffset(int16_t* offset);
+int16_t mpu6050_getYGyroOffset();
+void mpu6050_setYGyroOffset(int16_t* offset);
+int16_t mpu6050_getZGyroOffset();
+void mpu6050_setZGyroOffset(int16_t* offset);
+int16_t mpu6050_getXAccelOffset();
+void mpu6050_setXAccelOffset(int16_t* offset);
+int16_t mpu6050_getYAccelOffset();
+void mpu6050_setYAccelOffset(int16_t* offset);
+int16_t mpu6050_getZAccelOffset();
+void mpu6050_setZAccelOffset(int16_t* offset);
+
 //base dmp
 extern uint8_t mpu6050_dmpInitialize();
 extern void mpu6050_dmpEnable();
 extern void mpu6050_dmpDisable();
-extern void mpu6050_getQuaternion(const uint8_t* packet, q31_t *datawxyz, int32_t* temp_i);
-extern void mpu6050_getRollPitchYaw(q31_t *datawxyz, float32_t *rpy);
-extern uint8_t mpu6050_getQuaternionWait(q31_t *datawxyz);
+extern void mpu6050_getQuaternion(const uint8_t* packet, q31_t *quaternion, int32_t* temp_i);
+extern void mpu6050_getRollPitchYaw(q31_t *quaternion, float32_t *rpy);
+extern uint8_t mpu6050_getQuaternionWait(q31_t *quaternion);
 #endif
 
 #endif

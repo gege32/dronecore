@@ -128,22 +128,6 @@ void mpu6050_writeBit(uint8_t regAddr, uint8_t bitNum, uint8_t data) {
 }
 
 #if MPU6050_GETATTITUDE == 2
-/*
- * write word/words to chip register
- */
-//void mpu6050_writeWords(uint8_t regAddr, uint8_t length, uint16_t* data) {
-//	if(length > 0) {
-//	    HAL_I2C_Master_Transmit(hi2c_handler, MPU6050_ADDR, &regAddr, 1, 10);
-//		uint8_t i = 0;
-//		for (i = 0; i < length * 2; i++) {
-//			i2c_write((uint8_t)(data[i++] >> 8)); // send MSB
-//			i2c_write((uint8_t)data[i]);          // send LSB
-//			HAL_I2C_Master_Transmit(hi2c_handler, MPU6050_ADDR, (data[i++] >> 8), 1, 10);
-//			HAL_I2C_Master_Transmit(hi2c_handler, MPU6050_ADDR, (data[i++] >> 8), 1, 10);
-//		}
-//		i2c_stop();
-//	}
-//}
 
 /*
  * set a chip memory bank
@@ -362,49 +346,67 @@ void mpu6050_resetFIFO() {
 	mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_FIFO_RESET_BIT, 1);
 }
 
-/*
- * get gyro offset X
- */
-int8_t mpu6050_getXGyroOffset() {
-	mpu6050_readBits(MPU6050_RA_XG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH, (uint8_t *)buffer);
-    return buffer[0];
+// XG_OFFS_USR* registers
+
+int16_t mpu6050_getXGyroOffset() {
+	mpu6050_readBytes(MPU6050_RA_XG_OFFS_USRH, 2, (uint8_t *)buffer);
+    return (((int16_t)buffer[0]) << 8) | buffer[1];
+}
+void mpu6050_setXGyroOffset(int16_t* offset) {
+	mpu6050_writeWords(MPU6050_RA_XG_OFFS_USRH, 1, (uint16_t *)offset);
 }
 
-/*
- * set gyro offset X
- */
-void mpu6050_setXGyroOffset(int8_t offset) {
-	mpu6050_writeBits(MPU6050_RA_XG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH, offset);
+// YG_OFFS_USR* register
+
+int16_t mpu6050_getYGyroOffset() {
+	mpu6050_readBytes(MPU6050_RA_YG_OFFS_USRH, 2, (uint8_t *)buffer);
+    return (((int16_t)buffer[0]) << 8) | buffer[1];
+}
+void mpu6050_setYGyroOffset(int16_t* offset) {
+	mpu6050_writeWords(MPU6050_RA_YG_OFFS_USRH, 1, (uint16_t *)offset);
 }
 
-/*
- * get gyro offset Y
- */
-int8_t mpu6050_getYGyroOffset() {
-	mpu6050_readBits(MPU6050_RA_YG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH, (uint8_t *)buffer);
-    return buffer[0];
+// ZG_OFFS_USR* register
+
+int16_t mpu6050_getZGyroOffset() {
+	mpu6050_readBytes(MPU6050_RA_ZG_OFFS_USRH, 2, (uint8_t *)buffer);
+    return (((int16_t)buffer[0]) << 8) | buffer[1];
+}
+void mpu6050_setZGyroOffset(int16_t* offset) {
+	mpu6050_writeWords(MPU6050_RA_ZG_OFFS_USRH, 1, (uint16_t *)offset);
 }
 
-/*
- * set gyro offset Y
- */
-void mpu6050_setYGyroOffset(int8_t offset) {
-	mpu6050_writeBits(MPU6050_RA_YG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH, offset);
+// XA_OFFS_* registers
+
+int16_t mpu6050_getXAccelOffset() {
+    mpu6050_readBytes(MPU6050_RA_XA_OFFS_H, 2, (uint8_t *)buffer);
+    return (((int16_t)buffer[0]) << 8) | buffer[1];
 }
 
-/*
- * get gyro offset Z
- */
-int8_t mpu6050_getZGyroOffset() {
-	mpu6050_readBits(MPU6050_RA_ZG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH, (uint8_t *)buffer);
-    return buffer[0];
+void mpu6050_setXAccelOffset(int16_t* offset) {
+	mpu6050_writeWords(MPU6050_RA_XA_OFFS_H, 1, (uint16_t *)offset);
 }
 
-/*
- * set gyro offset Z
- */
-void mpu6050_setZGyroOffset(int8_t offset) {
-	mpu6050_writeBits(MPU6050_RA_ZG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH, offset);
+// YA_OFFS_* register
+
+int16_t mpu6050_getYAccelOffset() {
+	mpu6050_readBytes(MPU6050_RA_YA_OFFS_H, 2, (uint8_t *)buffer);
+    return (((int16_t)buffer[0]) << 8) | buffer[1];
+}
+
+void mpu6050_setYAccelOffset(int16_t* offset) {
+    mpu6050_writeWords(MPU6050_RA_YA_OFFS_H, 1, (uint16_t *)offset);
+}
+
+// ZA_OFFS_* register
+
+int16_t mpu6050_getZAccelOffset() {
+	mpu6050_readBytes(MPU6050_RA_ZA_OFFS_H, 2, (uint8_t *)buffer);
+    return (((int16_t)buffer[0]) << 8) | buffer[1];
+}
+
+void mpu6050_setZAccelOffset(int16_t* offset) {
+	mpu6050_writeWords(MPU6050_RA_ZA_OFFS_H, 1, (uint16_t *)offset);
 }
 #endif
 
@@ -439,6 +441,10 @@ uint8_t mpu6050_testConnection() {
  */
 void mpu6050_init(I2C_HandleTypeDef* hi2c) {
     i2c_handle = hi2c;
+
+	//reset
+	mpu6050_writeBit(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_DEVICE_RESET_BIT, 1);
+    osDelay(30);//wait after reset
 
     mpu6050_writeBit(MPU6050_RA_PWR_MGMT_1, 7, 1);
 	//allow mpu6050 chip clocks to start up

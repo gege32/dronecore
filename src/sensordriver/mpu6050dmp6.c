@@ -24,7 +24,6 @@ Please refer to LICENSE file for licensing information.
 
 #define MPU6050_DMP_CODE_SIZE 3062
 #define MPU6050_DMP_CONFIG_SIZE 6+6+6+6+12+5+15+14+7/*+13*/
-//#define MPU6050_DMP_UPDATES_SIZE 47
 
 volatile uint8_t mpu6050_mpuInterrupt = 0;
 uint8_t *dmpPacketBuffer;
@@ -260,33 +259,19 @@ const uint8_t mpu6050_dmpConfig[MPU6050_DMP_CONFIG_SIZE] __attribute__((section 
       0x04,   0x40,   0x03,   0x36, 0x56, 0x76,         // orientation gyro signs
       0x04,   0x31,   0x03,   0x26, 0x46, 0x66,         // orientation accel signs
 	  0x04,   0xb8,   0x09,   0xb8, 0xaa, 0xb3, 0x8d, 0xb4, 0x98, 0x0d, 0x35, 0x5d,         // CFG_MOTION_BIAS calibrate gyro data
-	  0x02,   0x16,   0x02,   0x00, 0x04,               //D_0_22 FIFO speed
+	  0x02,   0x16,   0x02,   0x00, 0x06,               //D_0_22 FIFO speed
 	  0x0A,   0xC1,   0x0C,   0xFE, 0XF2, 0xAB, 0xc4, 0xAA, 0xF1, 0xDF, 0xDF, 0xBB, 0xAF, 0xDF, 0xDF, //CFG_6 reason unknown, but is sets every time after fifo speed
 	  0x0A,   0x82,   0x0B,   0xd8, 0xb1, 0xb9, 0xf3, 0x8b, 0xa3, 0x91, 0xb6, 0x09, 0xb4, 0xd9,                     // CFG_FIFO_ON_EVENT inv_set_fifo_interupt
-//	  0x0A,   0x9e,   0x04,   0x20, 0x28, 0x30, 0x38, // CFG_8 inv_send_quaternion
-	  0x0A,   0x98,   0x04,   0xC0, 0xC2, 0xC4, 0xC6, // CFG_LP_QUAT inv_send_quaternion (accel only)
+	  0x0A,   0x9e,   0x04,   0x20, 0x28, 0x30, 0x38, // CFG_8 inv_send_quaternion
+//	  0x0A,   0x98,   0x04,   0xC0, 0xC2, 0xC4, 0xC6, // CFG_LP_QUAT inv_send_quaternion (accel only)
 //	  0x0A,   0xA7,   0x0A,   0xA3, 0xC0, 0xC8, 0xc2, 0xc4, 0xcc, 0xC6, 0xA3, 0xA3, 0xA3, //CFG_15 send raw accel/gyro data
 
 };
-
-//const uint8_t mpu6050_dmpUpdates[MPU6050_DMP_UPDATES_SIZE] __attribute__((section (".USER_FLASH")))= {
-//    0x01,   0xB2,   0x02,   0xFF, 0xFF,
-//    0x01,   0x90,   0x04,   0x09, 0x23, 0xA1, 0x35,
-//    0x01,   0x6A,   0x02,   0x06, 0x00,
-//    0x01,   0x60,   0x08,   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-//    0x00,   0x60,   0x04,   0x40, 0x00, 0x00, 0x00,
-//    0x01,   0x62,   0x02,   0x00, 0x00,
-//    0x00,   0x60,   0x04,   0x00, 0x40, 0x00, 0x00
-//};
 
 /*
  * initialize mpu6050 dmp
  */
 uint8_t mpu6050_dmpInitialize() {
-
-	//reset
-	mpu6050_writeBit(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_DEVICE_RESET_BIT, 1);
-    osDelay(30);//wait after reset
 
     //disable sleep mode
     mpu6050_setSleepDisabled();
@@ -294,19 +279,25 @@ uint8_t mpu6050_dmpInitialize() {
     //set memorybank to 0
     mpu6050_setMemoryBank(0, 0, 0);
 
-//    //get X/Y/Z gyro offsets
-//    int8_t xgOffset = mpu6050_getXGyroOffset();
-//    int8_t ygOffset = mpu6050_getYGyroOffset();
-//    int8_t zgOffset = mpu6050_getZGyroOffset();
+//    //mag -> setMode(0);
+//
+//    mpu6050_writeByte(0x0A, 0x01);
+//
+//    // setup AK8975 (0x0E) as Slave 0 in read mode
+//    mpu6050_writeByte( MPU6050_RA_I2C_SLV0_ADDR, 0x8E);
+//    mpu6050_writeByte(MPU6050_RA_I2C_SLV0_REG,  0x01);
+//    mpu6050_writeByte(MPU6050_RA_I2C_SLV0_CTRL, 0xDA);
+//
+//    // setup AK8975 (0x0E) as Slave 2 in write mode
+//    mpu6050_writeByte(MPU6050_RA_I2C_SLV2_ADDR, 0x0E);
+//    mpu6050_writeByte(MPU6050_RA_I2C_SLV2_REG,  0x0A);
+//    mpu6050_writeByte(MPU6050_RA_I2C_SLV2_CTRL, 0x81);
+//    mpu6050_writeByte(MPU6050_RA_I2C_SLV2_DO,   0x01);
+//
+//    // setup I2C timing/delay control
+//    mpu6050_writeByte(MPU6050_RA_I2C_SLV4_CTRL, 0x18);
+//    mpu6050_writeByte(MPU6050_RA_I2C_MST_DELAY_CTRL, 0x05);
 
-//    //setting slave 0 address to 0x7F
-//	mpu6050_writeByte(MPU6050_RA_I2C_SLV0_ADDR + 0*3, 0x7F);
-//	//disabling I2C Master mode
-//	mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_I2C_MST_EN_BIT, 0);
-//	//setting slave 0 address to 0x68 (self)
-//	mpu6050_writeByte(MPU6050_RA_I2C_SLV0_ADDR + 0*3, 0x68);
-//	//resetting I2C Master control
-//	mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_I2C_MST_RESET_BIT, 1);
 	osDelay(20);
 
     //load DMP code into memory banks
@@ -314,22 +305,11 @@ uint8_t mpu6050_dmpInitialize() {
         if (mpu6050_writeDMPConfigurationSet(mpu6050_dmpConfig, MPU6050_DMP_CONFIG_SIZE, 1)) {
         	//set clock source
         	osDelay(10);
-//        	mpu6050_writeBits(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH, MPU6050_CLOCK_PLL_ZGYRO);
-
         	//set DMP interrupts enabled
         	mpu6050_writeByte(MPU6050_RA_INT_ENABLE, 0x02);
 
-            //set sample rate
-//        	mpu6050_writeByte(MPU6050_RA_SMPLRT_DIV, 9); // 1khz / (1 + 4) = 200 Hz
-
             //set external frame sync to TEMP_OUT_L[0]
             mpu6050_writeBits(MPU6050_RA_CONFIG, MPU6050_CFG_EXT_SYNC_SET_BIT, MPU6050_CFG_EXT_SYNC_SET_LENGTH, MPU6050_EXT_SYNC_TEMP_OUT_L);
-
-            //set DLPF bandwidth to 42Hz
-//            mpu6050_writeBits(MPU6050_RA_CONFIG, MPU6050_CFG_DLPF_CFG_BIT, MPU6050_CFG_DLPF_CFG_LENGTH, MPU6050_DLPF_BW_42);
-
-            //set gyro sensitivity to +/- 2000 deg/sec
-//            mpu6050_writeBits(MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, MPU6050_GYRO_FS_2000);
 
             //set DMP configuration bytes/where the dmp program starts
             mpu6050_writeByte(MPU6050_RA_DMP_CFG_1, 0x04);
@@ -337,30 +317,6 @@ uint8_t mpu6050_dmpInitialize() {
 
             //clear OTP Bank flag
             mpu6050_writeBit(MPU6050_RA_XG_OFFS_TC, MPU6050_TC_OTP_BNK_VLD_BIT, 0);
-
-            //set X/Y/Z gyro offsets to previous values
-//            xgOffset = 0;
-//            ygOffset = 0;
-//            zgOffset = 90;
-//
-//            mpu6050_setXGyroOffset(xgOffset);
-//            mpu6050_setYGyroOffset(ygOffset);
-//            mpu6050_setZGyroOffset(zgOffset);
-
-            //set X/Y/Z gyro user offsets to zero
-//            mpu6050_writeWords(MPU6050_RA_XG_OFFS_USRH, 1, 0);
-//            mpu6050_writeWords(MPU6050_RA_YG_OFFS_USRH, 1, 0);
-//            mpu6050_writeWords(MPU6050_RA_ZG_OFFS_USRH, 1, 0);
-
-//            //writing final memory update 1/7 (function unknown)
-//            uint8_t dmpUpdate[16], j;
-//            uint16_t pos = 0;
-//            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
-//            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
-//
-//            //writing final memory update 2/7 (function unknown)
-//            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
-//            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
 
             //reset FIFO
             mpu6050_writeBits(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_FIFO_RESET_BIT, 1, 1);
@@ -389,52 +345,6 @@ uint8_t mpu6050_dmpInitialize() {
             mpu6050_writeByte(MPU6050_RA_ZRMOT_DUR, 0);
 
             //reset FIFO
-            mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_FIFO_RESET_BIT, 1);
-
-            //enabling DMP
-//            mpu6050_dmpEnable();
-
-            //resetting DMP
-//            mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_DMP_RESET_BIT, 1);
-
-//            osDelay(10);
-
-            //waiting for FIFO count > 2
-//            while ((fifoCount = mpu6050_getFIFOCount()) < 3);
-
-//            //writing final memory update 3/7 (function unknown)
-//            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
-//            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
-//
-//            //writing final memory update 4/7 (function unknown)
-//            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
-//            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
-//
-//            //writing final memory update 5/7 (function unknown)
-//            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
-//            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
-//
-//            //reading FIFO data..."));
-//            mpu6050_getFIFOBytes(fifoBuffer, fifoCount);
-//
-//            //reading final memory update 6/7 (function unknown)
-//            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
-//            mpu6050_readMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1]);
-//
-//            //waiting for FIFO count > 2
-//            while ((fifoCount = mpu6050_getFIFOCount()) < 3);
-//
-//            //reading FIFO data
-//            mpu6050_getFIFOBytes(fifoBuffer, fifoCount);
-//
-//            //writing final memory update 7/7 (function unknown)
-//            for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = mpu6050_dmpUpdates[pos];
-//            mpu6050_writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1], 1, 0);
-
-            //disabling DMP (you turn it on later)
-//            mpu6050_dmpDisable();
-
-            //resetting FIFO and clearing INT status one last time
             mpu6050_writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_FIFO_RESET_BIT, 1);
         } else {
         	trace_puts("failed to load dmp2");
@@ -470,7 +380,7 @@ void mpu6050_dmpDisable() {
 /*
  * get quaternion from packet
  */
-void mpu6050_getQuaternion(const uint8_t* packet, q31_t *datawxyz, int32_t* temp_i) {
+void mpu6050_getQuaternion(const uint8_t* packet, q31_t *quaternion, int32_t* temp_i) {
 	if (packet == 0) packet = dmpPacketBuffer;
 	float32_t temp_f [4];
 
@@ -484,7 +394,7 @@ void mpu6050_getQuaternion(const uint8_t* packet, q31_t *datawxyz, int32_t* temp
 	temp_f[2] = (float32_t)(temp_i[2] / 1073741824.0f);
 	temp_f[3] = (float32_t)(temp_i[3] / 1073741824.0f);
 
-	arm_float_to_q31(temp_f, datawxyz, 4);
+	arm_float_to_q31(temp_f, quaternion, 4);
 }
 
 /*
@@ -494,27 +404,27 @@ void mpu6050_getQuaternion(const uint8_t* packet, q31_t *datawxyz, int32_t* temp
  * 2. rotate around sensor Y plane by pitch
  * 3. rotate around sensor X plane by roll
  */
-void mpu6050_getRollPitchYaw(q31_t *datawxyz, float32_t *rpy) {
+void mpu6050_getRollPitchYaw(q31_t *quaternion, float32_t *rpy) {
     float32_t temp [4];
 
-    arm_q31_to_float(datawxyz, temp, 4);
+    arm_q31_to_float(quaternion, temp, 4);
 
     //squares
     q31_t squares_q [4];
     float32_t squares_f [4];
-    arm_mult_q31(datawxyz, datawxyz, squares_q, 4);
+    arm_mult_q31(quaternion, quaternion, squares_q, 4);
     arm_q31_to_float(squares_q, squares_f, 4);
 
 
     //mixed products: wx, yz, wy, zx, wz, xy
     q31_t mixed_q [6];
     float32_t mixed_f [6];
-    arm_mult_q31(datawxyz, datawxyz+1, mixed_q, 1);
-    arm_mult_q31(datawxyz+2, datawxyz+3, mixed_q+1, 1);
-    arm_mult_q31(datawxyz, datawxyz+2, mixed_q+2, 1);
-    arm_mult_q31(datawxyz+3, datawxyz+1, mixed_q+3, 1);
-    arm_mult_q31(datawxyz, datawxyz+3, mixed_q+4, 1);
-    arm_mult_q31(datawxyz+1, datawxyz+2, mixed_q+5, 1);
+    arm_mult_q31(quaternion, quaternion+1, mixed_q, 1);
+    arm_mult_q31(quaternion+2, quaternion+3, mixed_q+1, 1);
+    arm_mult_q31(quaternion, quaternion+2, mixed_q+2, 1);
+    arm_mult_q31(quaternion+3, quaternion+1, mixed_q+3, 1);
+    arm_mult_q31(quaternion, quaternion+3, mixed_q+4, 1);
+    arm_mult_q31(quaternion+1, quaternion+2, mixed_q+5, 1);
     arm_q31_to_float(mixed_q, mixed_f, 6);
 
     //roll / bank
@@ -532,10 +442,10 @@ void mpu6050_getRollPitchYaw(q31_t *datawxyz, float32_t *rpy) {
 /*
  * get quaternion and wait
  */
-uint8_t mpu6050_getQuaternionWait(q31_t *datawxyz) {
+uint8_t mpu6050_getQuaternionWait(q31_t *quaternion) {
 	//check for overflow
 	mpu6050_fifoCount = mpu6050_getFIFOCount();
-	if ((mpu6050_mpuIntStatus & 0x10) || mpu6050_fifoCount == 1024) {
+	if ((mpu6050_mpuIntStatus & 0x10) || mpu6050_fifoCount == 512) {
 		//reset
 		mpu6050_resetFIFO();
 	}
@@ -551,7 +461,7 @@ uint8_t mpu6050_getQuaternionWait(q31_t *datawxyz) {
 		mpu6050_getFIFOBytes(mpu6050_fifoBuffer, MPU6050_DMP_dmpPacketSize);
 		//get quaternion
 		int32_t temp_i [4];
-		mpu6050_getQuaternion(mpu6050_fifoBuffer, datawxyz, temp_i);
+		mpu6050_getQuaternion(mpu6050_fifoBuffer, quaternion, temp_i);
 
 //		trace_puts(mpu6050_fifoBuffer);
 
