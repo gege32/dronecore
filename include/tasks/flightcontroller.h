@@ -15,6 +15,13 @@
 
 extern QueueHandle_t sensorDataQueue;
 
+extern QueueHandle_t communicationToFlightControllerDataQueue;
+
+arm_pid_instance_q31 rear_left_motor_pid;
+arm_pid_instance_q31 rear_right_motor_pid;
+arm_pid_instance_q31 front_left_motor_pid;
+arm_pid_instance_q31 front_right_motor_pid;
+
 void FlightControllerTask(void* const arguments);
 
 #endif /* TASKS_FLIGHTCONTROLLER_H_ */

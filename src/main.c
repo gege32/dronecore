@@ -81,6 +81,10 @@ TaskHandle_t xFlightControllerTask = NULL;
 
 QueueHandle_t sensorDataQueue;
 
+QueueHandle_t communicationToFlightControllerDataQueue;
+
+QueueHandle_t communicationToSensorsDataQueue;
+
 RTC_HandleTypeDef hrtc;
 
 /* USER CODE BEGIN PV */
@@ -192,7 +196,7 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
-  sensorDataQueue = xQueueCreate(10, sizeof(SensorData*));
+  sensorDataQueue = xQueueCreate(10, sizeof(SensorData_TypeDef*));
   /* USER CODE END RTOS_QUEUES */
 
   snprintf(temp, 10, "%i", SystemCoreClock);
@@ -232,8 +236,10 @@ void SystemClock_Config(void)
 
     /**Initializes the CPU, AHB and APB busses clocks
     */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSE;
-  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+//  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSE;
+//  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.LSEState = RCC_LSE_OFF;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = 16;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
