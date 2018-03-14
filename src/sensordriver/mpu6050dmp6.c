@@ -380,9 +380,11 @@ void mpu6050_dmpDisable() {
 /*
  * get quaternion from packet
  */
-void mpu6050_getQuaternion(const uint8_t* packet, q31_t *quaternion, int32_t* temp_i) {
+void mpu6050_getQuaternion(const uint8_t* packet, q31_t *quaternion) {
 	if (packet == 0) packet = dmpPacketBuffer;
 	float32_t temp_f [4];
+
+	int32_t temp_i[4];
 
 	temp_i[0] = (((uint32_t)packet[0] << 24) | ((uint32_t)packet[1] << 16) | ((uint32_t)packet[2] << 8) | packet[3]);
 	temp_i[1] = (((uint32_t)packet[4] << 24) | ((uint32_t)packet[5] << 16) | ((uint32_t)packet[6] << 8) | packet[7]);
@@ -404,7 +406,7 @@ void mpu6050_getQuaternion(const uint8_t* packet, q31_t *quaternion, int32_t* te
  * 2. rotate around sensor Y plane by pitch
  * 3. rotate around sensor X plane by roll
  */
-void mpu6050_getRollPitchYaw(q31_t *quaternion, float32_t *rpy) {
+void mpu6050_getRollPitchYaw(q31_t *quaternion, q31_t *rpy) {
     float32_t temp [4];
 
     arm_q31_to_float(quaternion, temp, 4);
@@ -414,6 +416,8 @@ void mpu6050_getRollPitchYaw(q31_t *quaternion, float32_t *rpy) {
     float32_t squares_f [4];
     arm_mult_q31(quaternion, quaternion, squares_q, 4);
     arm_q31_to_float(squares_q, squares_f, 4);
+
+    float32_t result[3];
 
 
     //mixed products: wx, yz, wy, zx, wz, xy
@@ -428,15 +432,15 @@ void mpu6050_getRollPitchYaw(q31_t *quaternion, float32_t *rpy) {
     arm_q31_to_float(mixed_q, mixed_f, 6);
 
     //roll / bank
-    rpy[0] = (float32_t)atan2(2*(mixed_f[0] - mixed_f[1]), 1 - 2*(squares_f[1] + squares_f[3]));
+    result[0] = (float32_t)atan2(2*(mixed_f[0] - mixed_f[1]), 1 - 2*(squares_f[1] + squares_f[3]));
 
     //pitch / attitude
-    rpy[1] = (float32_t)-asin(2*(mixed_f[5] + mixed_f[4]));
+    result[1] = (float32_t)-asin(2*(mixed_f[5] + mixed_f[4]));
 
     //yaw /heading
-    rpy[2] = (float32_t)atan2(2*(mixed_f[2] - mixed_f[3]), 1 - 2*(squares_f[2] + squares_f[3]));
+    result[2] = (float32_t)atan2(2*(mixed_f[2] - mixed_f[3]), 1 - 2*(squares_f[2] + squares_f[3]));
 
-//	arm_float_to_q31(temp2, rpy, 3);
+	arm_float_to_q31(result, rpy, 3);
 }
 
 /*

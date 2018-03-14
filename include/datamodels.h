@@ -28,7 +28,7 @@ typedef struct{
 typedef struct{
 	uint8_t messageType;
 	q31_t data;
-}FlightControllerInit_TypeDef;
+}FlightControllerMessage_TypeDef;
 
 
 #endif /* DATAMODELS_H_ */

@@ -43,17 +43,18 @@ void SensorMeasurementTask(void const* argument){
     HAL_NVIC_SetPriority(EXTI9_5_IRQn, 8, 0);
     HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
-    float32_t data_f [3];
+    q31_t data_q [3];
     int8_t data_int[4];
 
     uint32_t speedofsound = 343;
     uint32_t pulseLenght;
 
+    SensorData_TypeDef* sensor_data = pvPortMalloc(sizeof(SensorData_TypeDef*));
+
     HAL_TIM_Base_Start(&htim3);
     HAL_TIM_IC_Start(&htim3, TIM_CHANNEL_1);
     HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
     __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 200);
-
 
 	for(;;){
 
@@ -64,12 +65,18 @@ void SensorMeasurementTask(void const* argument){
 		xSemaphoreTake(dataReady, portMAX_DELAY);
 
 		  mpu6050_getQuaternionWait(data);
-	      mpu6050_getRollPitchYaw(data, data_f);
+	      mpu6050_getRollPitchYaw(data, data_q);
+	      sensor_data->roll = data_q[0];
+	      sensor_data->pitch = data_q[1];
+	      sensor_data->yaw = data_q[2];
+	      sensor_data->height = 0;
+
+	      xQueueSend(sensorDataQueue, sensor_data, 1);
 
 //	    	  arm_q31_to_float(rpy, data_f, 3);
-	    	  snprintf(szoveg, 40, "%+.6f,%+.6f,%+.6f\r", data_f[0], data_f[1], data_f[2]);
-
-	    	  HAL_UART_Transmit(&huart1, szoveg, 34, 20);
+//	    	  snprintf(szoveg, 40, "%+.6f,%+.6f,%+.6f\r", data_f[0], data_f[1], data_f[2]);
+//
+//	    	  HAL_UART_Transmit(&huart1, szoveg, 34, 20);
 	}
 
 }
