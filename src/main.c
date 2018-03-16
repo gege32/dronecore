@@ -81,6 +81,10 @@ TaskHandle_t xFlightControllerTask = NULL;
 
 QueueHandle_t sensorDataQueue;
 
+QueueHandle_t communicationToFlightControllerDataQueue;
+
+QueueHandle_t communicationToSensorsDataQueue;
+
 RTC_HandleTypeDef hrtc;
 
 /* USER CODE BEGIN PV */
@@ -192,7 +196,7 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
-  sensorDataQueue = xQueueCreate(10, sizeof(SensorData*));
+  sensorDataQueue = xQueueCreate(10, sizeof(SensorData_TypeDef*));
   /* USER CODE END RTOS_QUEUES */
 
   snprintf(temp, 10, "%i", SystemCoreClock);
