@@ -13,29 +13,31 @@ void FlightControllerTask(void* const arguments){
 	SensorData_TypeDef* buffer = pvPortMalloc(sizeof(SensorData_TypeDef*));
 	BaseType_t newMessage;
 
-	rear_left_motor_pid = pvPortMalloc(sizeof(arm_pid_instance_q31*));
-	rear_right_motor_pid = pvPortMalloc(sizeof(arm_pid_instance_q31*));
-	front_left_motor_pid = pvPortMalloc(sizeof(arm_pid_instance_q31*));
-	front_right_motor_pid = pvPortMalloc(sizeof(arm_pid_instance_q31*));
+	roll_pid_instance = pvPortMalloc(sizeof(arm_pid_instance_q31));
+	pitch_pid_instance = pvPortMalloc(sizeof(arm_pid_instance_q31));
+	yaw_pid_instance = pvPortMalloc(sizeof(arm_pid_instance_q31));
+	height_pid_instance = pvPortMalloc(sizeof(arm_pid_instance_q31));
 
 	float32_t pidgain_f [] = {3.0f, 0.001f, 0.1f };
+	q31_t pidgain_q [3];
 
+	arm_float_to_q31(pidgain_f, pidgain_q, 3);
 
-	rear_left_motor_pid->Kp = rear_right_motor_pid->Kp = front_left_motor_pid->Kp = front_right_motor_pid->Kp = 5;
-	rear_left_motor_pid->Ki = rear_right_motor_pid->Ki = front_left_motor_pid->Ki = front_right_motor_pid->Ki = 5;
-	rear_left_motor_pid->Kd = rear_right_motor_pid->Kd = front_left_motor_pid->Kd = front_right_motor_pid->Kd = 5;
+	roll_pid_instance->Kp = pitch_pid_instance->Kp = yaw_pid_instance->Kp = height_pid_instance->Kp = pidgain_q[0];
+	roll_pid_instance->Ki = pitch_pid_instance->Ki = yaw_pid_instance->Ki = height_pid_instance->Ki = pidgain_q[1];
+	roll_pid_instance->Kd = pitch_pid_instance->Kd = yaw_pid_instance->Kd = height_pid_instance->Kd = pidgain_q[2];
 
-	arm_pid_init_q31(rear_left_motor_pid, 1);
-	arm_pid_init_q31(rear_right_motor_pid, 1);
-	arm_pid_init_q31(front_left_motor_pid, 1);
-	arm_pid_init_q31(front_right_motor_pid, 1);
+	arm_pid_init_q31(roll_pid_instance, 1);
+	arm_pid_init_q31(pitch_pid_instance, 1);
+	arm_pid_init_q31(yaw_pid_instance, 1);
+	arm_pid_init_q31(height_pid_instance, 1);
 
 	for(;;){
 
 
 		newMessage = xQueueReceive(sensorDataQueue, &buffer, 50);
 		if(newMessage == pdTRUE){
-			trace_puts("newMSG");
+
 		}
 
 

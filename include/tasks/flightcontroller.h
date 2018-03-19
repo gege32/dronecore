@@ -17,10 +17,10 @@ extern QueueHandle_t sensorDataQueue;
 
 extern QueueHandle_t communicationToFlightControllerDataQueue;
 
-arm_pid_instance_q31 * rear_left_motor_pid;
-arm_pid_instance_q31 * rear_right_motor_pid;
-arm_pid_instance_q31 * front_left_motor_pid;
-arm_pid_instance_q31 * front_right_motor_pid;
+arm_pid_instance_q31 * roll_pid_instance;
+arm_pid_instance_q31 * pitch_pid_instance;
+arm_pid_instance_q31 * yaw_pid_instance;
+arm_pid_instance_q31 * height_pid_instance;
 
 void FlightControllerTask(void* const arguments);
 
