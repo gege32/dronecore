@@ -464,8 +464,7 @@ uint8_t mpu6050_getQuaternionWait(q31_t *quaternion) {
 		//read a packet from FIFO
 		mpu6050_getFIFOBytes(mpu6050_fifoBuffer, MPU6050_DMP_dmpPacketSize);
 		//get quaternion
-		int32_t temp_i [4];
-		mpu6050_getQuaternion(mpu6050_fifoBuffer, quaternion, temp_i);
+		mpu6050_getQuaternion(mpu6050_fifoBuffer, quaternion);
 
 //		trace_puts(mpu6050_fifoBuffer);
 

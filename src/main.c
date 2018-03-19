@@ -174,7 +174,7 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  BaseType_t task1 = xTaskCreate(SensorMeasurementTask, "sensorTask", 256, &hi2c1, 5, &xSensorsTask);
+  BaseType_t task1 = xTaskCreate(SensorMeasurementTask, "sensorTask", 512, &hi2c1, 5, &xSensorsTask);
   BaseType_t task2 = xTaskCreate(FlightControllerTask, "flightControllerTask", 256, NULL, 5, &xFlightControllerTask);
 
   if(task1 != pdPASS){
