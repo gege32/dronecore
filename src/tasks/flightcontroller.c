@@ -11,7 +11,7 @@ void FlightControllerTask(void* const arguments){
 
 	trace_puts("initFC");
 	char szoveg [40];
-	SensorData_TypeDef* buffer = pvPortMalloc(sizeof(SensorData_TypeDef*));
+	SensorData_TypeDef* buffer = pvPortMalloc(sizeof(SensorData_TypeDef));
 	BaseType_t newMessage;
 
 	roll_pid_instance = pvPortMalloc(sizeof(arm_pid_instance_q31));
@@ -19,7 +19,7 @@ void FlightControllerTask(void* const arguments){
 	yaw_pid_instance = pvPortMalloc(sizeof(arm_pid_instance_q31));
 	height_pid_instance = pvPortMalloc(sizeof(arm_pid_instance_q31));
 
-	float32_t pidgain_f [] = {0.9f, 0.0001f, 0.01f };
+	float32_t pidgain_f [] = {0.9f, 0.0001f, 0.01f};
 	q31_t pidgain_q [3];
 
 	q31_t controlled_q [3];
@@ -39,7 +39,7 @@ void FlightControllerTask(void* const arguments){
 	for(;;){
 
 
-		newMessage = xQueueReceive(sensorDataQueue, &buffer, 50);
+		newMessage = xQueueReceive(sensorDataQueue, buffer, 50);
 		if(newMessage == pdTRUE){
 		    controlled_q[0] = arm_pid_q31(roll_pid_instance, buffer->roll);
 		    controlled_q[1] = arm_pid_q31(pitch_pid_instance, buffer->pitch);

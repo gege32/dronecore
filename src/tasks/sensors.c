@@ -45,6 +45,7 @@ void SensorMeasurementTask(void const* argument){
 
     q31_t data_q [3];
     int8_t data_int[4];
+    float32_t data_f[3];
 
     uint32_t speedofsound = 343;
     uint32_t pulseLenght;
@@ -72,10 +73,10 @@ void SensorMeasurementTask(void const* argument){
 
 	      xQueueSend(sensorDataQueue, sensor_data, 1);
 
-//	    	  arm_q31_to_float(rpy, data_f, 3);
-//	    	  snprintf(szoveg, 40, "%+.6f,%+.6f,%+.6f\r", data_f[0], data_f[1], data_f[2]);
+//	    	  arm_q31_to_float(data_q, data_f, 3);
+//	    	  snprintf(szoveg, 40, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
 //
-//	    	  HAL_UART_Transmit(&huart1, szoveg, 34, 20);
+//	    	  HAL_UART_Transmit(&huart1, szoveg, 40, 20);
 	}
 
 }
