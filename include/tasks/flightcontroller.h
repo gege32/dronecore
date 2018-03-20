@@ -14,16 +14,26 @@
 #include "semihosting/Trace.h"
 #include "datamodels.h"
 
+#define MAX_MOTOR_THROTTLE 2000;
+#define MIN_MOTOR_THROTTLE 1000;
+
 extern QueueHandle_t sensorDataQueue;
 
 extern QueueHandle_t communicationToFlightControllerDataQueue;
 
 extern UART_HandleTypeDef huart1;
 
+extern TIM_HandleTypeDef htim2;
+
 arm_pid_instance_q31 * roll_pid_instance;
 arm_pid_instance_q31 * pitch_pid_instance;
 arm_pid_instance_q31 * yaw_pid_instance;
 arm_pid_instance_q31 * height_pid_instance;
+
+uint32_t front_right_throttle = MIN_MOTOR_THROTTLE;
+uint32_t front_left_throttle = MIN_MOTOR_THROTTLE;
+uint32_t rear_right_throttle = MIN_MOTOR_THROTTLE;
+uint32_t rear_left_throttle = MIN_MOTOR_THROTTLE;
 
 void FlightControllerTask(void* const arguments);
 

@@ -25,6 +25,15 @@ void FlightControllerTask(void* const arguments){
 	q31_t controlled_q [3];
 	float32_t data_f[3];
 
+	uint32_t front_left_correction;
+	uint32_t front_right_correction;
+	uint32_t rear_left_correction;
+	uint32_t rear_right_correction;
+
+	uint32_t roll_correction;
+	uint32_t pitch_correction;
+	uint32_t yaw_correction;
+
 	arm_float_to_q31(pidgain_f, pidgain_q, 3);
 
 	roll_pid_instance->Kp = pitch_pid_instance->Kp = yaw_pid_instance->Kp = height_pid_instance->Kp = pidgain_q[0];
@@ -36,6 +45,19 @@ void FlightControllerTask(void* const arguments){
 	arm_pid_init_q31(yaw_pid_instance, 1);
 	arm_pid_init_q31(height_pid_instance, 1);
 
+	HAL_TIM_Base_Start(&htim2);
+
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
+
+//    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 1000);
+//    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 1000);
+//    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, 2000);
+//    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, 2000);
+
+
 	for(;;){
 
 
@@ -46,6 +68,11 @@ void FlightControllerTask(void* const arguments){
 		    controlled_q[2] = arm_pid_q31(yaw_pid_instance, buffer->yaw);
 
 		    arm_q31_to_float(controlled_q, data_f, 3);
+
+		    roll_correction = data_f[0] * 1000;
+		    pitch_correction = data_f[1] * 1000;
+		    yaw_correction = data_f[2] * 1000;
+
 		    snprintf(szoveg, 40, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
 		    HAL_UART_Transmit(&huart1, szoveg, 40, 20);
 		}

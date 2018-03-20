@@ -52,9 +52,9 @@ void SensorMeasurementTask(void const* argument){
 
     SensorData_TypeDef* sensor_data = pvPortMalloc(sizeof(SensorData_TypeDef));
 
-    HAL_TIM_Base_Start(&htim3);
-    HAL_TIM_IC_Start(&htim3, TIM_CHANNEL_1);
-    HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+//    HAL_TIM_Base_Start(&htim3);
+//    HAL_TIM_IC_Start(&htim3, TIM_CHANNEL_1);
+//    HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 
 	for(;;){
 
