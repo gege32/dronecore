@@ -49,7 +49,7 @@ void SensorMeasurementTask(void const* argument){
     uint32_t speedofsound = 343;
     uint32_t pulseLenght;
 
-    SensorData_TypeDef* sensor_data = pvPortMalloc(sizeof(SensorData_TypeDef*));
+    SensorData_TypeDef* sensor_data = pvPortMalloc(sizeof(SensorData_TypeDef));
 
     HAL_TIM_Base_Start(&htim3);
     HAL_TIM_IC_Start(&htim3, TIM_CHANNEL_1);

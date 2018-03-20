@@ -8,6 +8,7 @@
 #ifndef TASKS_FLIGHTCONTROLLER_H_
 #define TASKS_FLIGHTCONTROLLER_H_
 
+#include "stm32f1xx_hal.h"
 #include "arm_math.h"
 #include "cmsis_os.h"
 #include "semihosting/Trace.h"
@@ -16,6 +17,8 @@
 extern QueueHandle_t sensorDataQueue;
 
 extern QueueHandle_t communicationToFlightControllerDataQueue;
+
+extern UART_HandleTypeDef huart1;
 
 arm_pid_instance_q31 * roll_pid_instance;
 arm_pid_instance_q31 * pitch_pid_instance;

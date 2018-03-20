@@ -10,6 +10,7 @@
 void FlightControllerTask(void* const arguments){
 
 	trace_puts("initFC");
+	char szoveg [40];
 	SensorData_TypeDef* buffer = pvPortMalloc(sizeof(SensorData_TypeDef*));
 	BaseType_t newMessage;
 
@@ -18,8 +19,11 @@ void FlightControllerTask(void* const arguments){
 	yaw_pid_instance = pvPortMalloc(sizeof(arm_pid_instance_q31));
 	height_pid_instance = pvPortMalloc(sizeof(arm_pid_instance_q31));
 
-	float32_t pidgain_f [] = {3.0f, 0.001f, 0.1f };
+	float32_t pidgain_f [] = {0.9f, 0.0001f, 0.01f };
 	q31_t pidgain_q [3];
+
+	q31_t controlled_q [3];
+	float32_t data_f[3];
 
 	arm_float_to_q31(pidgain_f, pidgain_q, 3);
 
@@ -37,7 +41,13 @@ void FlightControllerTask(void* const arguments){
 
 		newMessage = xQueueReceive(sensorDataQueue, &buffer, 50);
 		if(newMessage == pdTRUE){
+		    controlled_q[0] = arm_pid_q31(roll_pid_instance, buffer->roll);
+		    controlled_q[1] = arm_pid_q31(pitch_pid_instance, buffer->pitch);
+		    controlled_q[2] = arm_pid_q31(yaw_pid_instance, buffer->yaw);
 
+		    arm_q31_to_float(controlled_q, data_f, 3);
+		    snprintf(szoveg, 40, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
+		    HAL_UART_Transmit(&huart1, szoveg, 40, 20);
 		}
 
 
