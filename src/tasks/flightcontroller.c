@@ -73,6 +73,14 @@ void FlightControllerTask(void* const arguments){
 		    pitch_correction = data_f[1] * 1000;
 		    yaw_correction = data_f[2] * 1000;
 
+		    if(roll_correction > 0){
+
+		    }else{
+
+		    }if(pitch_correction > 0){
+
+		    }
+
 		    snprintf(szoveg, 40, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
 		    HAL_UART_Transmit(&huart1, szoveg, 40, 20);
 		}
