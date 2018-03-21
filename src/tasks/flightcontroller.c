@@ -25,14 +25,14 @@ void FlightControllerTask(void* const arguments){
 	q31_t controlled_q [3];
 	float32_t data_f[3];
 
-	uint32_t front_left_correction;
-	uint32_t front_right_correction;
-	uint32_t rear_left_correction;
-	uint32_t rear_right_correction;
+	uint32_t front_left_correction = 0;
+	uint32_t front_right_correction = 0;
+	uint32_t rear_left_correction = 0;
+	uint32_t rear_right_correction = 0;
 
-	uint32_t roll_correction;
-	uint32_t pitch_correction;
-	uint32_t yaw_correction;
+	uint32_t roll_correction = 0;
+	uint32_t pitch_correction = 0;
+	uint32_t yaw_correction = 0;
 
 	arm_float_to_q31(pidgain_f, pidgain_q, 3);
 
@@ -74,11 +74,26 @@ void FlightControllerTask(void* const arguments){
 		    yaw_correction = data_f[2] * 1000;
 
 		    if(roll_correction > 0){
-
+		    	front_left_correction += roll_correction;
+		    	front_right_correction -= roll_correction;
+		    	rear_left_correction += roll_correction;
+		    	rear_right_correction -= roll_correction;
 		    }else{
-
-		    }if(pitch_correction > 0){
-
+		    	front_left_correction -= roll_correction;
+		    	front_right_correction += roll_correction;
+		    	rear_left_correction -= roll_correction;
+		    	rear_right_correction += roll_correction;
+		    }
+		    if(pitch_correction > 0){
+		    	front_left_correction += pitch_correction;
+		    	front_right_correction += pitch_correction;
+		    	rear_left_correction -= pitch_correction;
+		    	rear_right_correction -= pitch_correction;
+		    }else{
+		    	front_left_correction -= pitch_correction;
+		    	front_right_correction -= pitch_correction;
+		    	rear_left_correction += pitch_correction;
+		    	rear_right_correction += pitch_correction;
 		    }
 
 		    snprintf(szoveg, 40, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
