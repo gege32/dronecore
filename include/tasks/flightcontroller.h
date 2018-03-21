@@ -30,10 +30,10 @@ arm_pid_instance_q31 * pitch_pid_instance;
 arm_pid_instance_q31 * yaw_pid_instance;
 arm_pid_instance_q31 * height_pid_instance;
 
-uint32_t front_right_throttle = MIN_MOTOR_THROTTLE;
-uint32_t front_left_throttle = MIN_MOTOR_THROTTLE;
-uint32_t rear_right_throttle = MIN_MOTOR_THROTTLE;
-uint32_t rear_left_throttle = MIN_MOTOR_THROTTLE;
+uint32_t front_right_throttle;
+uint32_t front_left_throttle;
+uint32_t rear_right_throttle;
+uint32_t rear_left_throttle;
 
 void FlightControllerTask(void* const arguments);
 

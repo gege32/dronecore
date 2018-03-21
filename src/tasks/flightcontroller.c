@@ -34,6 +34,11 @@ void FlightControllerTask(void* const arguments){
 	uint32_t pitch_correction = 0;
 	uint32_t yaw_correction = 0;
 
+	front_right_throttle = MIN_MOTOR_THROTTLE;
+	front_left_throttle = MIN_MOTOR_THROTTLE;
+	rear_right_throttle = MIN_MOTOR_THROTTLE;
+	rear_left_throttle = MIN_MOTOR_THROTTLE;
+
 	arm_float_to_q31(pidgain_f, pidgain_q, 3);
 
 	roll_pid_instance->Kp = pitch_pid_instance->Kp = yaw_pid_instance->Kp = height_pid_instance->Kp = pidgain_q[0];
