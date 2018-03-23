@@ -14,8 +14,13 @@
 #include "semihosting/Trace.h"
 #include "datamodels.h"
 
-#define MAX_MOTOR_THROTTLE 2000;
-#define MIN_MOTOR_THROTTLE 1000;
+#define MAX_MOTOR_THROTTLE 2000
+#define MIN_MOTOR_THROTTLE 1000
+
+#define FRONT_LEFT_MOTOR_TIMER TIM_CHANNEL_1
+#define FRONT_RIGHT_MOTOR_TIMER TIM_CHANNEL_2
+#define REAR_RIGHT_MOTOR_TIMER TIM_CHANNEL_3
+#define REAR_LEFT_MOTOR_TIMER TIM_CHANNEL_4
 
 extern QueueHandle_t sensorDataQueue;
 

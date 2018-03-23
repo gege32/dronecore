@@ -12,6 +12,7 @@
 #include "cmsis_os.h"
 #include "semihosting/Trace.h"
 #include "sensordriver/mpu6050.h"
+#include "sensordriver/bmp180.h"
 #include "datamodels.h"
 #include "arm_math.h"
 
@@ -22,6 +23,8 @@ extern UART_HandleTypeDef huart1;
 extern TIM_HandleTypeDef htim3;
 
 extern QueueHandle_t sensorDataQueue;
+
+CalibrationData * bmp180_calibration_data;
 
 void SensorMeasurementTask(void const* argument);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);

@@ -62,6 +62,10 @@ void FlightControllerTask(void* const arguments){
 //    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, 2000);
 //    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, 2000);
 
+    front_left_throttle = 1500;
+    front_right_throttle = 1500;
+    rear_left_throttle = 1500;
+    rear_right_throttle = 1500;
 
 	for(;;){
 
@@ -101,13 +105,63 @@ void FlightControllerTask(void* const arguments){
 		    	rear_right_correction += pitch_correction;
 		    }
 
-		    snprintf(szoveg, 40, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
+		    front_left_throttle += front_left_correction;
+		    front_right_throttle += front_right_correction;
+		    rear_left_throttle += rear_left_correction;
+		    rear_right_throttle += rear_right_correction;
+
+		    //checking not to run out of throttle bounds
+		    if(front_left_throttle < MIN_MOTOR_THROTTLE){
+		    	front_left_throttle = MIN_MOTOR_THROTTLE;
+		    }else if(front_left_throttle > MAX_MOTOR_THROTTLE){
+		    	front_left_throttle = MAX_MOTOR_THROTTLE;
+		    }
+		    if(front_right_throttle < MIN_MOTOR_THROTTLE){
+		    	front_right_throttle = MIN_MOTOR_THROTTLE;
+		    }else if(front_right_throttle > MAX_MOTOR_THROTTLE){
+		    	front_right_throttle = MAX_MOTOR_THROTTLE;
+		    }
+		    if(rear_left_throttle < MIN_MOTOR_THROTTLE){
+		    	rear_left_throttle = MIN_MOTOR_THROTTLE;
+		    }else if(rear_left_throttle > MAX_MOTOR_THROTTLE){
+		    	rear_left_throttle = MAX_MOTOR_THROTTLE;
+		    }
+		    if(rear_right_throttle < MIN_MOTOR_THROTTLE){
+		    	rear_right_throttle = MIN_MOTOR_THROTTLE;
+		    }else if(rear_right_throttle > MAX_MOTOR_THROTTLE){
+		    	rear_right_throttle = MAX_MOTOR_THROTTLE;
+		    }
+
+			__HAL_TIM_SET_COMPARE(&htim2, FRONT_LEFT_MOTOR_TIMER, front_left_throttle);
+			__HAL_TIM_SET_COMPARE(&htim2, FRONT_RIGHT_MOTOR_TIMER, front_right_throttle);
+			__HAL_TIM_SET_COMPARE(&htim2, REAR_LEFT_MOTOR_TIMER, rear_left_throttle);
+			__HAL_TIM_SET_COMPARE(&htim2, REAR_RIGHT_MOTOR_TIMER, rear_right_throttle);
+
+			front_left_correction = 0;
+			front_right_correction = 0;
+			rear_left_correction = 0;
+			rear_right_correction = 0;
+
+		    snprintf(szoveg, 40, "%if,%i,%i,%i\r", front_left_throttle, front_right_throttle, rear_left_throttle, rear_right_throttle);
 		    HAL_UART_Transmit(&huart1, szoveg, 40, 20);
 		}
-
-
-
-
-
 	}
+}
+
+void CalibrateESC(){
+
+	//sending max
+	__HAL_TIM_SET_COMPARE(&htim2, FRONT_LEFT_MOTOR_TIMER, MAX_MOTOR_THROTTLE);
+	__HAL_TIM_SET_COMPARE(&htim2, FRONT_RIGHT_MOTOR_TIMER, MAX_MOTOR_THROTTLE);
+	__HAL_TIM_SET_COMPARE(&htim2, REAR_LEFT_MOTOR_TIMER, MAX_MOTOR_THROTTLE);
+	__HAL_TIM_SET_COMPARE(&htim2, REAR_RIGHT_MOTOR_TIMER, MAX_MOTOR_THROTTLE);
+
+	osDelay(5000);
+
+	//back to zero throttle
+
+	__HAL_TIM_SET_COMPARE(&htim2, FRONT_LEFT_MOTOR_TIMER, MIN_MOTOR_THROTTLE);
+	__HAL_TIM_SET_COMPARE(&htim2, FRONT_RIGHT_MOTOR_TIMER, MIN_MOTOR_THROTTLE);
+	__HAL_TIM_SET_COMPARE(&htim2, REAR_LEFT_MOTOR_TIMER, MIN_MOTOR_THROTTLE);
+	__HAL_TIM_SET_COMPARE(&htim2, REAR_RIGHT_MOTOR_TIMER, MIN_MOTOR_THROTTLE);
 }

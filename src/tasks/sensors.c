@@ -12,12 +12,27 @@ void SensorMeasurementTask(void const* argument){
 
 	dataReady = xSemaphoreCreateBinary();
 
+	bmp180_calibration_data = pvPortMalloc(sizeof(CalibrationData));
+
+	char szoveg [40];
+
 	//initialize sensors
 	trace_puts("sensor task started");
 	mpu6050_init((I2C_HandleTypeDef*)argument);
+	bmp180_initialize((I2C_HandleTypeDef*)argument);
+	bool test = bmp180_check_presence();
+	if(test == TRUE){
+		trace_puts("sOK");
+		bmp180_get_calibration_data(bmp180_calibration_data);
+		bmp180_get_uncompensated_pressure(bmp180_calibration_data);
+		bmp180_get_uncompensated_temperature(bmp180_calibration_data);
+		bmp180_calculate_true_pressure(bmp180_calibration_data);
+		bmp180_calculate_true_temperature(bmp180_calibration_data);
+		float f = bmp180_get_absolute_altitude(bmp180_calibration_data);
+		snprintf(szoveg, 40, "altitude= %+.6f", f);
+		trace_puts(szoveg);
+	}
 	osDelay(250);
-
-	char szoveg [40];
 
     GPIO_InitTypeDef gpio;
     gpio.Pin = GPIO_PIN_13;
@@ -47,14 +62,7 @@ void SensorMeasurementTask(void const* argument){
     int8_t data_int[4];
     float32_t data_f[3];
 
-    uint32_t speedofsound = 343;
-    uint32_t pulseLenght;
-
     SensorData_TypeDef* sensor_data = pvPortMalloc(sizeof(SensorData_TypeDef));
-
-//    HAL_TIM_Base_Start(&htim3);
-//    HAL_TIM_IC_Start(&htim3, TIM_CHANNEL_1);
-//    HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 
 	for(;;){
 
