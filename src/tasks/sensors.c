@@ -13,6 +13,7 @@ void SensorMeasurementTask(void const* argument){
 	dataReady = xSemaphoreCreateBinary();
 
 	bmp180_calibration_data = pvPortMalloc(sizeof(CalibrationData));
+	bmp180_calibration_data->oss = 3;
 
 	char szoveg [40];
 

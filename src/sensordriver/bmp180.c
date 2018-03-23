@@ -49,7 +49,7 @@ bool bmp180_check_presence() {
 void bmp180_get_calibration_data(CalibrationData *c) {
 	Buffer_Tx1[0] = 0xAA; // Begin of calibration data, 22 bytes length
 	HAL_I2C_Master_Transmit(hi2c, BMP180_ADDRESS, Buffer_Tx1, 1, 10);
-	HAL_I2C_Master_Receive(hi2c, BMP180_ADDRESS, Buffer_Rx1, 21, 10);
+	HAL_I2C_Master_Receive(hi2c, BMP180_ADDRESS, Buffer_Rx1, 22, 10);
 
 
 	c->AC1 = Buffer_Rx1[0] << 8 | Buffer_Rx1[1];
@@ -69,7 +69,7 @@ void bmp180_get_calibration_data(CalibrationData *c) {
 void bmp180_get_uncompensated_temperature(CalibrationData* data) {
 	Buffer_Tx1[0] = 0xF4; // Register to write
 	Buffer_Tx1[1] = 0x2E; // Value to write (measure temperature)
-	HAL_I2C_Master_Transmit(hi2c, BMP180_ADDRESS, Buffer_Tx1, 1, 10);
+	HAL_I2C_Master_Transmit(hi2c, BMP180_ADDRESS, Buffer_Tx1, 2, 10);
 
 
 	osDelay(5 /*ms*/);
@@ -86,7 +86,7 @@ void bmp180_get_uncompensated_temperature(CalibrationData* data) {
 void bmp180_get_uncompensated_pressure(CalibrationData* data) {
 	Buffer_Tx1[0] = 0xF4; // Register to write
 	Buffer_Tx1[1] = 0x34 | (data->oss << 6); // Value to write (measure pressure)
-	HAL_I2C_Master_Transmit(hi2c, BMP180_ADDRESS, Buffer_Tx1, 1, 10);
+	HAL_I2C_Master_Transmit(hi2c, BMP180_ADDRESS, Buffer_Tx1, 2, 10);
 
 	// Wait for reading
 	osDelay(bmp180_get_delay(data->oss));
