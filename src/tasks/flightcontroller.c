@@ -19,7 +19,7 @@ void FlightControllerTask(void* const arguments){
 	yaw_pid_instance = pvPortMalloc(sizeof(arm_pid_instance_q31));
 	height_pid_instance = pvPortMalloc(sizeof(arm_pid_instance_q31));
 
-	float32_t pidgain_f [] = {0.9f, 0.0001f, 0.01f};
+	float32_t pidgain_f [] = {1.0f, 0.0001f, 0.01f};
 	q31_t pidgain_q [3];
 
 	q31_t controlled_q [3];

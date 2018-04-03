@@ -432,13 +432,13 @@ void mpu6050_getRollPitchYaw(q31_t *quaternion, q31_t *rpy) {
     arm_q31_to_float(mixed_q, mixed_f, 6);
 
     //roll / bank
-    result[0] = (float32_t)atan2(2*(mixed_f[0] - mixed_f[1]), 1 - 2*(squares_f[1] + squares_f[3]));
+    result[0] = (float32_t)atan2(2*(mixed_f[0] - mixed_f[1]), 1 - 2*(squares_f[1] + squares_f[3])) / M_PI;
 
     //pitch / attitude
-    result[1] = (float32_t)-asin(2*(mixed_f[5] + mixed_f[4]));
+    result[1] = (float32_t)-asin(2*(mixed_f[5] + mixed_f[4])) / M_PI;
 
     //yaw /heading
-    result[2] = (float32_t)atan2(2*(mixed_f[2] - mixed_f[3]), 1 - 2*(squares_f[2] + squares_f[3]));
+    result[2] = (float32_t)atan2(2*(mixed_f[2] - mixed_f[3]), 1 - 2*(squares_f[2] + squares_f[3])) / M_PI;
 
 	arm_float_to_q31(result, rpy, 3);
 }

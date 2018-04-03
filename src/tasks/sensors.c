@@ -74,6 +74,7 @@ void SensorMeasurementTask(void const* argument){
 		xSemaphoreTake(dataReady, portMAX_DELAY);
 
 		  mpu6050_getQuaternionWait(data);
+		  //RPY is in q31, and is scaled down to +-1 range. (except for yaw, since it should be 360deg.
 	      mpu6050_getRollPitchYaw(data, data_q);
 	      sensor_data->roll = data_q[0];
 	      sensor_data->pitch = data_q[1];
