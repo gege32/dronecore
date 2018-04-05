@@ -187,10 +187,10 @@ int main(void)
   unsigned char test [] = "test";
   HAL_UART_Transmit(&huart1, test, 4, 10);
 
-//  xTaskCreate(CommunicationTask, "communicationTask", 128, &huart1, 4, xCommTask);
+  xTaskCreate(CommunicationTask, "communicationTask", 128, &huart2, 4, &xCommTask);
 
 
-  Wifi_Init(osPriorityNormal, &huart2);
+//  Wifi_Init(osPriorityNormal, &huart2);
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 

@@ -144,8 +144,8 @@ void FlightControllerTask(void* const arguments){
 			rear_left_correction = 0;
 			rear_right_correction = 0;
 
-		    snprintf(szoveg, 40, "%if,%i,%i,%i\r", front_left_throttle, front_right_throttle, rear_left_throttle, rear_right_throttle);
-		    HAL_UART_Transmit(&huart1, szoveg, 40, 20);
+//		    snprintf(szoveg, 40, "%if,%i,%i,%i\r", front_left_throttle, front_right_throttle, rear_left_throttle, rear_right_throttle);
+//		    HAL_UART_Transmit(&huart1, szoveg, 40, 20);
 		}
 	}
 }

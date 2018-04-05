@@ -11,7 +11,7 @@
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
 #include "semihosting/Trace.h"
-#include "commdriver/Wifi.h"
+#include "commdriver/ESP8266.h"
 
 void CommunicationTask(void const* argument);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
