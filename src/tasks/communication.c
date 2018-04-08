@@ -14,6 +14,8 @@ void CommunicationTask(void const* argument){
 
     for(;;){
 
+        osDelay(20);
+
     }
 
 }
