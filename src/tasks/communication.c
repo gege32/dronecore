@@ -9,19 +9,17 @@
 
 void CommunicationTask(void const* argument){
 
+    uint8_t* databuffer = pvPortMalloc(sizeof(uint8_t) * 64);
+
 	trace_puts("commStart");
     ESP8266_initialize((UART_HandleTypeDef*)argument);
+    ESP8266_checksocket();
 
     for(;;){
 
-        osDelay(20);
+        osDelay(500);
+        ESP8266_readdata(databuffer, 10);
 
     }
 
 }
-//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
-//
-//    if(huart == uart_wifi){
-//
-//    }
-//}
