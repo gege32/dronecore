@@ -68,7 +68,7 @@ void ESP8266_initialize(UART_HandleTypeDef* huart_handle){
 bool ESP8266_checksocket(){
 
     HAL_UART_Transmit(uart_wifi,"AT+CIPSEND=1\r\n", 14, 10);
-    HAL_UART_Receive(uart_wifi, esp8266_rx_buffer, 3, 10);
+    HAL_UART_Receive(uart_wifi, esp8266_rx_buffer, 10, 10);
     trace_puts(esp8266_rx_buffer);
     ESP8266_clearbuffer();
     HAL_UART_Transmit(uart_wifi,"A\r\n", 3, 10);

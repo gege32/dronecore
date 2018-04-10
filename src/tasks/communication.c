@@ -18,7 +18,7 @@ void CommunicationTask(void const* argument){
     for(;;){
 
         osDelay(500);
-        ESP8266_readdata(databuffer, 10);
+        ESP8266_checksocket(databuffer, 10);
 
     }
 
