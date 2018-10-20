@@ -59,6 +59,11 @@
 
 /* Private define ------------------------------------------------------------*/
 
+#define NRF_CE_PIN_Pin GPIO_PIN_12
+#define NRF_CE_PIN_GPIO_Port GPIOB
+#define nRF_CSN_PIN_Pin GPIO_PIN_8
+#define nRF_CSN_PIN_GPIO_Port GPIOA
+
 /* ########################## Assert Selection ############################## */
 /**
   * @brief Uncomment the line below to expanse the "assert_param" macro in the 

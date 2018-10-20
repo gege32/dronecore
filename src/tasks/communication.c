@@ -9,16 +9,14 @@
 
 void CommunicationTask(void const* argument){
 
-    uint8_t* databuffer = pvPortMalloc(sizeof(uint8_t) * 64);
+    trace_puts("sensor task started");
 
-	trace_puts("commStart");
-    ESP8266_initialize((UART_HandleTypeDef*)argument);
-    ESP8266_checksocket();
+    nRF24_HAL_Init((SPI_HandleTypeDef*)argument);
+
+    uint32_t calc = 0;
 
     for(;;){
-
-        osDelay(500);
-        ESP8266_checksocket(databuffer, 10);
+        calc++;
 
     }
 
