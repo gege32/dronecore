@@ -13,6 +13,11 @@
 //   data - value to transmit via SPI
 // return: value received from SPI
 uint8_t nRF24_LL_RW(uint8_t data) {
+
+    HAL_SPI_TransmitReceive(spi_handle, &data, &spi_input_buffer, 1, 10);
+
+    return spi_input_buffer;
+
 }
 
 void nRF24_HAL_Init(SPI_HandleTypeDef* hspi2){

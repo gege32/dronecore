@@ -618,7 +618,7 @@ void StartDefaultTask(void const * argument)
       osDelay(500);
 
 	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-        osDelay(500);
+      osDelay(500);
   }
   /* USER CODE END 5 */
 }
