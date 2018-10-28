@@ -67,10 +67,6 @@ void SensorMeasurementTask(void const* argument){
 
 	for(;;){
 
-//		pulseLenght = HAL_TIM_ReadCapturedValue(&htim3, TIM_CHANNEL_1);
-//		snprintf(szoveg, 40, "p:%i\r\n", pulseLenght);
-//		HAL_UART_Transmit(&huart1, szoveg, 12, 20);
-
 		xSemaphoreTake(dataReady, portMAX_DELAY);
 
 		  mpu6050_getQuaternionWait(data);
@@ -83,10 +79,10 @@ void SensorMeasurementTask(void const* argument){
 
 	      xQueueSend(sensorDataQueue, sensor_data, 1);
 
-	    	  arm_q31_to_float(data_q, data_f, 3);
-	    	  snprintf(szoveg, 40, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
-
-	    	  HAL_UART_Transmit(&huart1, szoveg, 40, 20);
+//	    	  arm_q31_to_float(data_q, data_f, 3);
+//	    	  snprintf(szoveg, 32, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
+//
+//	    	  HAL_UART_Transmit(&huart1, szoveg, 32, 20);
 	}
 
 }

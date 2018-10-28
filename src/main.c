@@ -201,6 +201,8 @@ int main(void)
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   sensorDataQueue = xQueueCreate(10, sizeof(SensorData_TypeDef));
+  communicationToFlightControllerDataQueue = xQueueCreate(10, sizeof(ControllerInput_TypeDef));
+
   /* USER CODE END RTOS_QUEUES */
 
   snprintf(temp, 10, "%i", SystemCoreClock);

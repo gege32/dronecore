@@ -13,6 +13,8 @@ void CommunicationTask(void const* argument){
 
     nRF24_HAL_Init((SPI_HandleTypeDef*)argument);
 
+    ControllerInput_TypeDef* incomming = pvPortMalloc(sizeof(ControllerInput_TypeDef));
+
     osDelay(100);
     // Configure RX PIPE#1
     static const uint8_t nRF24_ADDR[] = { '1','E','D','O','N' };
@@ -50,10 +52,20 @@ void CommunicationTask(void const* argument){
             // Clear all pending IRQ flags
             nRF24_ClearIRQFlags();
 
-            // Print a payload contents to trace
-            trace_puts(nRF24_payload);
+            incomming->throttle = (((uint32_t)nRF24_payload[0] << 24) | ((uint32_t)nRF24_payload[1] << 16) | ((uint32_t)nRF24_payload[2] << 8) | nRF24_payload[3]);
+//            incomming->delta_roll = (((uint32_t)nRF24_payload[4] << 24) | ((uint32_t)nRF24_payload[5] << 16) | ((uint32_t)nRF24_payload[6] << 8) | nRF24_payload[7]);
+//            incomming->delta_pitch = (((uint32_t)nRF24_payload[8] << 24) | ((uint32_t)nRF24_payload[9] << 16) | ((uint32_t)nRF24_payload[10] << 8) | nRF24_payload[11]);
+//            incomming->delta_yaw = (((uint32_t)nRF24_payload[12] << 24) | ((uint32_t)nRF24_payload[13] << 16) | ((uint32_t)nRF24_payload[14] << 8) | nRF24_payload[15]);
+            incomming->delta_roll = 0;
+            incomming->delta_pitch = 0;
+            incomming->delta_yaw = 0;
+
+            incomming->throttle += 1000;
+
+            xQueueSend(communicationToFlightControllerDataQueue, incomming, 1);
         }
         osDelay(500);
     }
 
 }
+

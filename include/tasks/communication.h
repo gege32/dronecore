@@ -14,6 +14,10 @@
 
 #include "commdriver/nrf24.h"
 
+#include "datamodels.h"
+
+extern QueueHandle_t communicationToFlightControllerDataQueue;
+
 void CommunicationTask(void const* argument);
 
 #endif /* TASKS_COMMUNICATION_H_ */

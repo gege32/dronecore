@@ -12,6 +12,7 @@ void FlightControllerTask(void* const arguments){
 	trace_puts("initFC");
 	char szoveg [40];
 	SensorData_TypeDef* buffer = pvPortMalloc(sizeof(SensorData_TypeDef));
+	ControllerInput_TypeDef* comm_buffer = pvPortMalloc(sizeof(ControllerInput_TypeDef));
 	BaseType_t newMessage;
 
 	roll_pid_instance = pvPortMalloc(sizeof(arm_pid_instance_q31));
@@ -64,12 +65,16 @@ void FlightControllerTask(void* const arguments){
 //    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, 2000);
 //    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, 2000);
 
-    front_left_throttle = 1500;
-    front_right_throttle = 1500;
-    rear_left_throttle = 1500;
-    rear_right_throttle = 1500;
-
 	for(;;){
+
+	    newMessage = xQueueReceive(communicationToFlightControllerDataQueue, comm_buffer, 0);
+	    if(newMessage == pdTRUE){
+	        front_left_throttle = comm_buffer->throttle;
+	        front_right_throttle = comm_buffer->throttle;
+	        rear_left_throttle = comm_buffer->throttle;
+	        rear_right_throttle = comm_buffer->throttle;
+	    }
+
 
 
 		newMessage = xQueueReceive(sensorDataQueue, buffer, 50);
