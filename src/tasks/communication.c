@@ -7,17 +7,17 @@
 
 #include "tasks/communication.h"
 
-void CommunicationTask(void const* argument){
+void CommunicationTask(void const* argument) {
 
     trace_puts("sensor task started");
 
-    nRF24_HAL_Init((SPI_HandleTypeDef*)argument);
+    nRF24_HAL_Init((SPI_HandleTypeDef*) argument);
 
     ControllerInput_TypeDef* incomming = pvPortMalloc(sizeof(ControllerInput_TypeDef));
 
     osDelay(100);
     // Configure RX PIPE#1
-    static const uint8_t nRF24_ADDR[] = { '1','E','D','O','N' };
+    static const uint8_t nRF24_ADDR[] = { '1', 'E', 'D', 'O', 'N' };
     nRF24_SetRFChannel(90); // set RF channel to 2490MHz
     nRF24_SetDataRate(nRF24_DR_2Mbps); // 2Mbit/s data rate
     nRF24_SetCRCScheme(nRF24_CRC_1byte); // 1-byte CRC scheme
@@ -38,13 +38,13 @@ void CommunicationTask(void const* argument){
     nRF24_RXResult pipe;
 
     uint8_t test = nRF24_Check();
-    if(test == 0){
+    if (test == 0) {
         trace_puts("nrf0");
-    }else{
+    } else {
         trace_puts("nrf1");
     }
 
-    for(;;){
+    for (;;) {
         if (nRF24_GetStatus_RXFIFO() != nRF24_STATUS_RXFIFO_EMPTY) {
             // Get a payload from the transceiver
             pipe = nRF24_ReadPayload(nRF24_payload, &payload_length);
@@ -52,19 +52,25 @@ void CommunicationTask(void const* argument){
             // Clear all pending IRQ flags
             nRF24_ClearIRQFlags();
 
-            incomming->throttle = (((uint32_t)nRF24_payload[0] << 24) | ((uint32_t)nRF24_payload[1] << 16) | ((uint32_t)nRF24_payload[2] << 8) | nRF24_payload[3]);
-//            incomming->delta_roll = (((uint32_t)nRF24_payload[4] << 24) | ((uint32_t)nRF24_payload[5] << 16) | ((uint32_t)nRF24_payload[6] << 8) | nRF24_payload[7]);
-//            incomming->delta_pitch = (((uint32_t)nRF24_payload[8] << 24) | ((uint32_t)nRF24_payload[9] << 16) | ((uint32_t)nRF24_payload[10] << 8) | nRF24_payload[11]);
-//            incomming->delta_yaw = (((uint32_t)nRF24_payload[12] << 24) | ((uint32_t)nRF24_payload[13] << 16) | ((uint32_t)nRF24_payload[14] << 8) | nRF24_payload[15]);
-            incomming->delta_roll = 0;
-            incomming->delta_pitch = 0;
-            incomming->delta_yaw = 0;
+            if (nRF24_payload[0] == '<') {
+                if (nRF24_payload[1] == 0x01) {
 
-            incomming->throttle += 1000;
+                    incomming->throttle = (((uint32_t) nRF24_payload[2] << 24) | ((uint32_t) nRF24_payload[3] << 16) | ((uint32_t) nRF24_payload[4] << 8) | nRF24_payload[5]);
+//                  incomming->delta_roll = (((uint32_t)nRF24_payload[4] << 24) | ((uint32_t)nRF24_payload[5] << 16) | ((uint32_t)nRF24_payload[6] << 8) | nRF24_payload[7]);
+//                  incomming->delta_pitch = (((uint32_t)nRF24_payload[8] << 24) | ((uint32_t)nRF24_payload[9] << 16) | ((uint32_t)nRF24_payload[10] << 8) | nRF24_payload[11]);
+//                  incomming->delta_yaw = (((uint32_t)nRF24_payload[12] << 24) | ((uint32_t)nRF24_payload[13] << 16) | ((uint32_t)nRF24_payload[14] << 8) | nRF24_payload[15]);
+                    incomming->delta_roll = 0;
+                    incomming->delta_pitch = 0;
+                    incomming->delta_yaw = 0;
 
-            xQueueSend(communicationToFlightControllerDataQueue, incomming, 1);
+                    incomming->throttle += 1000;
+
+                    xQueueSend(communicationToFlightControllerDataQueue, incomming, 1);
+                }
+
+            }
         }
-        osDelay(500);
+        osDelay(100);
     }
 
 }
