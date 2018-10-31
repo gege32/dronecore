@@ -44,6 +44,8 @@ void CommunicationTask(void const* argument) {
         trace_puts("nrf1");
     }
 
+    char szoveg[40];
+
     for (;;) {
         if (nRF24_GetStatus_RXFIFO() != nRF24_STATUS_RXFIFO_EMPTY) {
             // Get a payload from the transceiver
@@ -62,8 +64,6 @@ void CommunicationTask(void const* argument) {
                     incomming->delta_roll = 0;
                     incomming->delta_pitch = 0;
                     incomming->delta_yaw = 0;
-
-                    incomming->throttle += 1000;
 
                     xQueueSend(communicationToFlightControllerDataQueue, incomming, 1);
                 }

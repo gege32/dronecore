@@ -178,7 +178,7 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  BaseType_t task1 = xTaskCreate(SensorMeasurementTask, "sensorTask", 512, &hi2c1, 5, &xSensorsTask);
+  BaseType_t task1 = xTaskCreate(SensorMeasurementTask, "sensorTask", 512, &hi2c1, 4, &xSensorsTask);
   BaseType_t task2 = xTaskCreate(FlightControllerTask, "flightControllerTask", 256, NULL, 5, &xFlightControllerTask);
 
   if(task1 != pdPASS){
@@ -191,7 +191,7 @@ int main(void)
   unsigned char test [] = "test";
   HAL_UART_Transmit(&huart1, test, 4, 10);
 
-  xTaskCreate(CommunicationTask, "communicationTask", 128, &hspi2, 4, &xCommTask);
+  xTaskCreate(CommunicationTask, "communicationTask", 128, &hspi2, 3, &xCommTask);
 
 
 //  Wifi_Init(osPriorityNormal, &huart2);

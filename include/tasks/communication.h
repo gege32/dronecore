@@ -16,6 +16,8 @@
 
 #include "datamodels.h"
 
+extern UART_HandleTypeDef huart1;
+
 extern QueueHandle_t communicationToFlightControllerDataQueue;
 
 void CommunicationTask(void const* argument);
