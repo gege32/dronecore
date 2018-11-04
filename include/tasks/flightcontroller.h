@@ -14,8 +14,8 @@
 #include "semihosting/Trace.h"
 #include "datamodels.h"
 
-#define MAX_MOTOR_THROTTLE 1300
-#define IDLE_MOTOR_THROTTLE 1150
+#define MAX_MOTOR_THROTTLE 1400
+#define IDLE_MOTOR_THROTTLE 1200
 #define MIN_MOTOR_THROTTLE 1000
 
 #define FRONT_LEFT_MOTOR_TIMER TIM_CHANNEL_1 //PA15

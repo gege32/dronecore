@@ -9,7 +9,7 @@
 
 void CommunicationTask(void const* argument) {
 
-    trace_puts("sensor task started");
+    trace_puts("comm task started");
 
     nRF24_HAL_Init((SPI_HandleTypeDef*) argument);
 
@@ -65,7 +65,7 @@ void CommunicationTask(void const* argument) {
                     incomming->delta_pitch = 0;
                     incomming->delta_yaw = 0;
 
-                    xQueueSend(communicationToFlightControllerDataQueue, incomming, 1);
+                    xQueueOverwrite(communicationToFlightControllerDataQueue, incomming);
                 }
 
             }

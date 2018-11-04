@@ -178,8 +178,8 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  BaseType_t task1 = xTaskCreate(SensorMeasurementTask, "sensorTask", 512, &hi2c1, 4, &xSensorsTask);
-  BaseType_t task2 = xTaskCreate(FlightControllerTask, "flightControllerTask", 256, NULL, 5, &xFlightControllerTask);
+  BaseType_t task1 = xTaskCreate(SensorMeasurementTask, "sensorTask", 512, &hi2c1, 5, &xSensorsTask);
+  BaseType_t task2 = xTaskCreate(FlightControllerTask, "flightControllerTask", 256, NULL, 4, &xFlightControllerTask);
 
   if(task1 != pdPASS){
 	  trace_puts("task1fail");
@@ -200,8 +200,8 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
-  sensorDataQueue = xQueueCreate(10, sizeof(SensorData_TypeDef));
-  communicationToFlightControllerDataQueue = xQueueCreate(10, sizeof(ControllerInput_TypeDef));
+  sensorDataQueue = xQueueCreate(1, sizeof(SensorData_TypeDef));
+  communicationToFlightControllerDataQueue = xQueueCreate(1, sizeof(ControllerInput_TypeDef));
 
   /* USER CODE END RTOS_QUEUES */
 
