@@ -14,7 +14,8 @@
 #include "semihosting/Trace.h"
 #include "datamodels.h"
 
-#define MAX_MOTOR_THROTTLE 1400
+#define MAX_MOTOR_THROTTLE 2000
+#define MAX_LIMIT_MOTOR_THROTTLE 1500
 #define IDLE_MOTOR_THROTTLE 1200
 #define MIN_MOTOR_THROTTLE 1000
 

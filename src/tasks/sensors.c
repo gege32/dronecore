@@ -72,16 +72,17 @@ void SensorMeasurementTask(void const* argument) {
         //RPY is in q31, and is scaled down to +-1 range. (except for yaw, since it should be 360deg.
         mpu6050_getRollPitchYaw(data, data_q);
         sensor_data->roll = data_q[0];
-        sensor_data->pitch = data_q[1];
-        sensor_data->yaw = data_q[2];
+        //WARNING!!!!!! TODO: RESEARCH RPY+QUAT
+        sensor_data->pitch = data_q[2];
+        sensor_data->yaw = data_q[1];
         sensor_data->height = 0;
 
         xQueueSend(sensorDataQueue, sensor_data, 1);
 
-//        arm_q31_to_float(data_q, data_f, 3);
-//        snprintf(szoveg, 32, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
-//
-//        HAL_UART_Transmit(&huart1, szoveg, 32, 20);
+        arm_q31_to_float(data_q, data_f, 3);
+        snprintf(szoveg, 32, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
+
+        HAL_UART_Transmit(&huart1, szoveg, 32, 20);
     }
 
 }

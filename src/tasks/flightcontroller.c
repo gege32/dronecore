@@ -25,10 +25,11 @@ void FlightControllerTask(void* const arguments) {
     yaw_pid_instance = pvPortMalloc(sizeof(arm_pid_instance_q31));
     height_pid_instance = pvPortMalloc(sizeof(arm_pid_instance_q31));
 
-    float32_t pidgain_f[] = { 1.0f, 0.004f, 0.1f };
+    float32_t pidgain_f[] = { 1.0f, 0.02f, 0.4f };
     q31_t pidgain_q[3];
 
     q31_t controlled_q[3];
+    q31_t diff_q[3];
     float32_t data_f[3];
 
     int32_t roll_correction = 0;
@@ -65,16 +66,20 @@ void FlightControllerTask(void* const arguments) {
         xQueueReceive(sensorDataQueue, buffer, portMAX_DELAY);
         xQueueReceive(communicationToFlightControllerDataQueue, comm_buffer, 0);
 
-        if (comm_buffer->throttle != 0) {
+        if (comm_buffer->throttle > IDLE_MOTOR_THROTTLE) {
 
             front_left_throttle = comm_buffer->throttle;
             front_right_throttle = comm_buffer->throttle;
             rear_left_throttle = comm_buffer->throttle;
             rear_right_throttle = comm_buffer->throttle;
 
-            controlled_q[0] = arm_pid_q31(roll_pid_instance, buffer->roll);
-            controlled_q[1] = arm_pid_q31(pitch_pid_instance, buffer->pitch);
-            controlled_q[2] = arm_pid_q31(yaw_pid_instance, buffer->yaw);
+            arm_sub_q31(&(comm_buffer->delta_roll), &(buffer->roll), diff_q, 1);
+            arm_sub_q31(&(comm_buffer->delta_pitch), &(buffer->pitch), diff_q + 1, 1);
+            arm_sub_q31(&(comm_buffer->delta_yaw), &(buffer->yaw), diff_q + 2, 1);
+
+            controlled_q[0] = arm_pid_q31(roll_pid_instance, diff_q[0]);
+            controlled_q[1] = arm_pid_q31(pitch_pid_instance, diff_q[1]);
+            controlled_q[2] = arm_pid_q31(yaw_pid_instance, diff_q[2]);
 
             arm_q31_to_float(controlled_q, data_f, 3);
 
@@ -85,28 +90,28 @@ void FlightControllerTask(void* const arguments) {
             front_left_throttle = front_left_throttle + roll_correction + pitch_correction;
             front_right_throttle = front_right_throttle - roll_correction + pitch_correction;
             rear_left_throttle = rear_left_throttle + roll_correction - pitch_correction;
-            rear_right_throttle = rear_right_throttle - roll_correction - roll_correction;
+            rear_right_throttle = rear_right_throttle - roll_correction - pitch_correction;
 
             //checking not to run out of throttle bounds
             if (front_left_throttle < IDLE_MOTOR_THROTTLE) {
                 front_left_throttle = IDLE_MOTOR_THROTTLE;
-            } else if (front_left_throttle > MAX_MOTOR_THROTTLE) {
-                front_left_throttle = MAX_MOTOR_THROTTLE;
+            } else if (front_left_throttle > MAX_LIMIT_MOTOR_THROTTLE) {
+                front_left_throttle = MAX_LIMIT_MOTOR_THROTTLE;
             }
             if (front_right_throttle < IDLE_MOTOR_THROTTLE) {
                 front_right_throttle = IDLE_MOTOR_THROTTLE;
-            } else if (front_right_throttle > MAX_MOTOR_THROTTLE) {
-                front_right_throttle = MAX_MOTOR_THROTTLE;
+            } else if (front_right_throttle > MAX_LIMIT_MOTOR_THROTTLE) {
+                front_right_throttle = MAX_LIMIT_MOTOR_THROTTLE;
             }
             if (rear_left_throttle < IDLE_MOTOR_THROTTLE) {
                 rear_left_throttle = IDLE_MOTOR_THROTTLE;
-            } else if (rear_left_throttle > MAX_MOTOR_THROTTLE) {
-                rear_left_throttle = MAX_MOTOR_THROTTLE;
+            } else if (rear_left_throttle > MAX_LIMIT_MOTOR_THROTTLE) {
+                rear_left_throttle = MAX_LIMIT_MOTOR_THROTTLE;
             }
             if (rear_right_throttle < IDLE_MOTOR_THROTTLE) {
                 rear_right_throttle = IDLE_MOTOR_THROTTLE;
-            } else if (rear_right_throttle > MAX_MOTOR_THROTTLE) {
-                rear_right_throttle = MAX_MOTOR_THROTTLE;
+            } else if (rear_right_throttle > MAX_LIMIT_MOTOR_THROTTLE) {
+                rear_right_throttle = MAX_LIMIT_MOTOR_THROTTLE;
             }
 
             __HAL_TIM_SET_COMPARE(&htim2, FRONT_LEFT_MOTOR_TIMER, front_left_throttle);
@@ -114,7 +119,7 @@ void FlightControllerTask(void* const arguments) {
             __HAL_TIM_SET_COMPARE(&htim2, REAR_LEFT_MOTOR_TIMER, rear_left_throttle);
             __HAL_TIM_SET_COMPARE(&htim2, REAR_RIGHT_MOTOR_TIMER, rear_right_throttle);
 
-        } else if(comm_buffer->throttle < IDLE_MOTOR_THROTTLE) {
+        } else if(comm_buffer->throttle < IDLE_MOTOR_THROTTLE && comm_buffer->throttle > 0) {
             __HAL_TIM_SET_COMPARE(&htim2, FRONT_LEFT_MOTOR_TIMER, IDLE_MOTOR_THROTTLE);
             __HAL_TIM_SET_COMPARE(&htim2, FRONT_RIGHT_MOTOR_TIMER, IDLE_MOTOR_THROTTLE);
             __HAL_TIM_SET_COMPARE(&htim2, REAR_LEFT_MOTOR_TIMER, IDLE_MOTOR_THROTTLE);
@@ -139,7 +144,7 @@ void CalibrateESC() {
     __HAL_TIM_SET_COMPARE(&htim2, REAR_LEFT_MOTOR_TIMER, MAX_MOTOR_THROTTLE);
     __HAL_TIM_SET_COMPARE(&htim2, REAR_RIGHT_MOTOR_TIMER, MAX_MOTOR_THROTTLE);
 
-    osDelay(10000);
+    osDelay(7000);
 
     //back to zero throttle
 
