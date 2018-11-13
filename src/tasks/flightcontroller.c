@@ -36,6 +36,8 @@ void FlightControllerTask(void* const arguments) {
     int32_t pitch_correction = 0;
     int32_t yaw_correction = 0;
 
+    uint32_t throttle = 0;
+
     front_right_throttle = MIN_MOTOR_THROTTLE;
     front_left_throttle = MIN_MOTOR_THROTTLE;
     rear_right_throttle = MIN_MOTOR_THROTTLE;
@@ -68,10 +70,7 @@ void FlightControllerTask(void* const arguments) {
 
         if (comm_buffer->throttle > IDLE_MOTOR_THROTTLE) {
 
-            front_left_throttle = comm_buffer->throttle;
-            front_right_throttle = comm_buffer->throttle;
-            rear_left_throttle = comm_buffer->throttle;
-            rear_right_throttle = comm_buffer->throttle;
+            throttle = comm_buffer->throttle - 1000;
 
             arm_sub_q31(&(comm_buffer->delta_roll), &(buffer->roll), diff_q, 1);
             arm_sub_q31(&(comm_buffer->delta_pitch), &(buffer->pitch), diff_q + 1, 1);
@@ -83,14 +82,18 @@ void FlightControllerTask(void* const arguments) {
 
             arm_q31_to_float(controlled_q, data_f, 3);
 
-            roll_correction = data_f[0] * (float32_t) 1000.0;
-            pitch_correction = data_f[1] * (float32_t) 1000.0;
-            yaw_correction = data_f[2] * (float32_t) 1000.0;
+//            snprintf(szoveg, 32, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
+//
+//            HAL_UART_Transmit(&huart1, szoveg, 32, 20);
 
-            front_left_throttle = front_left_throttle + roll_correction + pitch_correction;
-            front_right_throttle = front_right_throttle - roll_correction + pitch_correction;
-            rear_left_throttle = rear_left_throttle + roll_correction - pitch_correction;
-            rear_right_throttle = rear_right_throttle - roll_correction - pitch_correction;
+            roll_correction = (data_f[0] + 1.0) * (float32_t) 1000.0;
+            pitch_correction = (data_f[1] + 1.0) * (float32_t) 1000.0;
+            yaw_correction = (data_f[2] + 1.0) * (float32_t) 1000.0;
+
+            front_left_throttle = throttle - (roll_correction + pitch_correction + yaw_correction) / 3;
+            front_right_throttle = throttle + (roll_correction + pitch_correction - yaw_correction) / 3;
+            rear_left_throttle = throttle - (roll_correction - pitch_correction - yaw_correction) / 3;
+            rear_right_throttle = throttle + (roll_correction - pitch_correction + yaw_correction) / 3;
 
             //checking not to run out of throttle bounds
             if (front_left_throttle < IDLE_MOTOR_THROTTLE) {
@@ -119,7 +122,7 @@ void FlightControllerTask(void* const arguments) {
             __HAL_TIM_SET_COMPARE(&htim2, REAR_LEFT_MOTOR_TIMER, rear_left_throttle);
             __HAL_TIM_SET_COMPARE(&htim2, REAR_RIGHT_MOTOR_TIMER, rear_right_throttle);
 
-        } else if(comm_buffer->throttle < IDLE_MOTOR_THROTTLE && comm_buffer->throttle > 0) {
+        } else if (comm_buffer->throttle < IDLE_MOTOR_THROTTLE && 0 < comm_buffer->throttle) {
             __HAL_TIM_SET_COMPARE(&htim2, FRONT_LEFT_MOTOR_TIMER, IDLE_MOTOR_THROTTLE);
             __HAL_TIM_SET_COMPARE(&htim2, FRONT_RIGHT_MOTOR_TIMER, IDLE_MOTOR_THROTTLE);
             __HAL_TIM_SET_COMPARE(&htim2, REAR_LEFT_MOTOR_TIMER, IDLE_MOTOR_THROTTLE);
@@ -130,8 +133,8 @@ void FlightControllerTask(void* const arguments) {
             __HAL_TIM_SET_COMPARE(&htim2, REAR_LEFT_MOTOR_TIMER, MIN_MOTOR_THROTTLE);
             __HAL_TIM_SET_COMPARE(&htim2, REAR_RIGHT_MOTOR_TIMER, MIN_MOTOR_THROTTLE);
         }
-//        snprintf(szoveg, 22, "%i,%i,%i,%i\r\n", front_left_throttle, front_right_throttle, rear_left_throttle, rear_right_throttle);
-//        HAL_UART_Transmit(&huart1, szoveg, 22, 20);
+        snprintf(szoveg, 22, "%i,%i,%i,%i\r\n", front_left_throttle, front_right_throttle, rear_left_throttle, rear_right_throttle);
+        HAL_UART_Transmit(&huart1, szoveg, 22, 20);
 
     }
 }

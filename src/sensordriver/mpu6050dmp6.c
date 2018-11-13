@@ -25,6 +25,8 @@ Please refer to LICENSE file for licensing information.
 #define MPU6050_DMP_CODE_SIZE 3062
 #define MPU6050_DMP_CONFIG_SIZE 6+6+6+6+12+5+15+14+7/*+13*/
 
+#define EULER_DOWNSCALING 12.5663706144
+
 volatile uint8_t mpu6050_mpuInterrupt = 0;
 uint8_t *dmpPacketBuffer;
 uint16_t mpu6050_fifoCount = 0;
@@ -432,13 +434,13 @@ void mpu6050_getRollPitchYaw(q31_t *quaternion, q31_t *rpy) {
     arm_q31_to_float(mixed_q, mixed_f, 6);
 
     //roll / bank
-    result[0] = (float32_t)atan2(2*(mixed_f[0] - mixed_f[1]), 1 - 2*(squares_f[1] + squares_f[3])) / M_PI;
+    result[0] = (float32_t)atan2(2*(mixed_f[0] - mixed_f[1]), 1 - 2*(squares_f[1] + squares_f[3])) / EULER_DOWNSCALING;
 
     //pitch / attitude
-    result[1] = (float32_t)-asin(2*(mixed_f[5] + mixed_f[4])) / M_PI;
+    result[1] = (float32_t)-asin(2*(mixed_f[5] + mixed_f[4])) / EULER_DOWNSCALING;
 
     //yaw /heading
-    result[2] = (float32_t)atan2(2*(mixed_f[2] - mixed_f[3]), 1 - 2*(squares_f[2] + squares_f[3])) / M_PI;
+    result[2] = (float32_t)atan2(2*(mixed_f[2] - mixed_f[3]), 1 - 2*(squares_f[2] + squares_f[3])) / EULER_DOWNSCALING;
 
 	arm_float_to_q31(result, rpy, 3);
 }
