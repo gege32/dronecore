@@ -18,7 +18,7 @@ typedef struct{
 }SensorData_TypeDef;
 
 typedef struct{
-    uint32_t throttle;
+    q31_t throttle;
     q31_t delta_roll;
     q31_t delta_pitch;
     q31_t delta_yaw;
