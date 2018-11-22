@@ -68,25 +68,25 @@ void CommunicationTask(void const* argument) {
             if (nRF24_payload[0] == '<' && nRF24_payload[18] == '>') {
                 if (nRF24_payload[1] == 0x01) {
 
-                    incomming->throttle = (((uint32_t) nRF24_payload[2] << 24) | ((uint32_t) nRF24_payload[3] << 16) | ((uint32_t) nRF24_payload[4] << 8) | nRF24_payload[5]);
+                    incomming->throttle = (((uint32_t) nRF24_payload[2] << 24) | ((uint32_t) nRF24_payload[3] << 16) | ((uint32_t) nRF24_payload[4] << 8) | nRF24_payload[5]) / 2147483648.0f;
 //                  incomming->delta_roll = (((uint32_t)nRF24_payload[4] << 24) | ((uint32_t)nRF24_payload[5] << 16) | ((uint32_t)nRF24_payload[6] << 8) | nRF24_payload[7]);
 //                  incomming->delta_pitch = (((uint32_t)nRF24_payload[8] << 24) | ((uint32_t)nRF24_payload[9] << 16) | ((uint32_t)nRF24_payload[10] << 8) | nRF24_payload[11]);
 //                  incomming->delta_yaw = (((uint32_t)nRF24_payload[12] << 24) | ((uint32_t)nRF24_payload[13] << 16) | ((uint32_t)nRF24_payload[14] << 8) | nRF24_payload[15]);
-                    incomming->delta_roll = 0;
-                    incomming->delta_pitch = 0;
-                    incomming->delta_yaw = 0;
+                    incomming->delta_roll = 0.0f;
+                    incomming->delta_pitch = 0.0f;
+                    incomming->delta_yaw = 0.0f;
                 } else {
-                    incomming->throttle = 0;
-                    incomming->delta_roll = 0;
-                    incomming->delta_pitch = 0;
-                    incomming->delta_yaw = 0;
+                    incomming->throttle = 0.0f;
+                    incomming->delta_roll = 0.0f;
+                    incomming->delta_pitch = 0.0f;
+                    incomming->delta_yaw = 0.0f;
                 }
 
             } else {
-                incomming->throttle = 0;
-                incomming->delta_roll = 0;
-                incomming->delta_pitch = 0;
-                incomming->delta_yaw = 0;
+                incomming->throttle = 0.0f;
+                incomming->delta_roll = 0.0f;
+                incomming->delta_pitch = 0.0f;
+                incomming->delta_yaw = 0.0f;
             }
             xQueueOverwrite(communicationToFlightControllerDataQueue, incomming);
         }

@@ -41,9 +41,6 @@ void SensorMeasurementTask(void const* argument) {
     gpio.Speed = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init(GPIOC, &gpio);
 
-    q31_t data[4] = { 0 };
-    q31_t rpy[3] = { 0 };
-
     mpu6050_dmpInitialize();
     mpu6050_dmpEnable();
 
@@ -58,30 +55,27 @@ void SensorMeasurementTask(void const* argument) {
     HAL_NVIC_SetPriority(EXTI9_5_IRQn, 8, 0);
     HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
-    q31_t data_q[3];
-    int8_t data_int[4];
     float32_t data_f[3];
 
     SensorData_TypeDef* sensor_data = pvPortMalloc(sizeof(SensorData_TypeDef));
+    Quternion_TypeDef* quaternion = pvPortMalloc(sizeof(Quternion_TypeDef));
 
     for (;;) {
 
         xSemaphoreTake(dataReady, portMAX_DELAY);
 
-        mpu6050_getQuaternionWait(data);
-        //RPY is in q31, and is scaled down to +-1 range. (except for yaw, since it should be 360deg.
-        mpu6050_getRollPitchYaw(data, data_q);
-        sensor_data->roll = data_q[0];
-        //WARNING!!!!!! TODO: RESEARCH RPY+QUAT
-        sensor_data->pitch = data_q[2];
-        sensor_data->yaw = data_q[1];
+        mpu6050_getQuaternionWait(quaternion);
+        //RPY is in float32
+        mpu6050_getRollPitchYaw(quaternion, data_f);
+        sensor_data->roll = data_f[0];
+        //TODO!!! WHYYYYYYY
+        sensor_data->pitch = data_f[2];
+        sensor_data->yaw = data_f[1];
         sensor_data->height = 0;
 
         xQueueSend(sensorDataQueue, sensor_data, 1);
 
-        arm_q31_to_float(data_q, data_f, 3);
 //        snprintf(szoveg, 32, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
-//
 //        HAL_UART_Transmit(&huart1, szoveg, 32, 20);
     }
 

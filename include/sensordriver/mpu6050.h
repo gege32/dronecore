@@ -21,6 +21,8 @@ References:
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
 #include "arm_math.h"
+#include "datamodels.h"
+#include "helpers/helper_3dmath.h"
 //definitions
 #define MPU6050_ADDR (0x68 <<1) //device address - 0x68 pin low (GND), 0x69 pin high (VCC)
 
@@ -159,9 +161,9 @@ void mpu6050_setZAccelOffset(int16_t* offset);
 extern uint8_t mpu6050_dmpInitialize();
 extern void mpu6050_dmpEnable();
 extern void mpu6050_dmpDisable();
-extern void mpu6050_getQuaternion(const uint8_t* packet, q31_t *quaternion);
-extern void mpu6050_getRollPitchYaw(q31_t *quaternion, q31_t *rpy);
-extern uint8_t mpu6050_getQuaternionWait(q31_t *quaternion);
+extern void mpu6050_getQuaternion(const uint8_t* packet, Quternion_TypeDef *quaternion);
+extern void mpu6050_getRollPitchYaw(Quternion_TypeDef *quaternion, float32_t *rpy);
+extern uint8_t mpu6050_getQuaternionWait(Quternion_TypeDef *quaternion);
 #endif
 
 #endif

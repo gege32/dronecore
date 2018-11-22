@@ -382,9 +382,8 @@ void mpu6050_dmpDisable() {
 /*
  * get quaternion from packet
  */
-void mpu6050_getQuaternion(const uint8_t* packet, q31_t *quaternion) {
+void mpu6050_getQuaternion(const uint8_t* packet, Quternion_TypeDef *quaternion) {
 	if (packet == 0) packet = dmpPacketBuffer;
-	float32_t temp_f [4];
 
 	int32_t temp_i[4];
 
@@ -393,12 +392,13 @@ void mpu6050_getQuaternion(const uint8_t* packet, q31_t *quaternion) {
 	temp_i[2] = (((uint32_t)packet[8] << 24) | ((uint32_t)packet[9] << 16) | ((uint32_t)packet[10] << 8) | packet[11]);
 	temp_i[3] = (((uint32_t)packet[12] << 24) | ((uint32_t)packet[13] << 16) | ((uint32_t)packet[14] << 8) | packet[15]);
 
-	temp_f[0] = (float32_t)(temp_i[0] / 1073741824.0f);
-	temp_f[1] = (float32_t)(temp_i[1] / 1073741824.0f);
-	temp_f[2] = (float32_t)(temp_i[2] / 1073741824.0f);
-	temp_f[3] = (float32_t)(temp_i[3] / 1073741824.0f);
+	quaternion->w = (float32_t)(temp_i[0] / 1073741824.0f);
+	quaternion->x = (float32_t)(temp_i[1] / 1073741824.0f);
+	quaternion->y = (float32_t)(temp_i[2] / 1073741824.0f);
+	quaternion->z = (float32_t)(temp_i[3] / 1073741824.0f);
 
-	arm_float_to_q31(temp_f, quaternion, 4);
+	normalizeQuat(quaternion);
+
 }
 
 /*
@@ -408,53 +408,29 @@ void mpu6050_getQuaternion(const uint8_t* packet, q31_t *quaternion) {
  * 2. rotate around sensor Y plane by pitch
  * 3. rotate around sensor X plane by roll
  */
-void mpu6050_getRollPitchYaw(q31_t *quaternion, q31_t *rpy) {
-    float32_t temp [4];
-
-    arm_q31_to_float(quaternion, temp, 4);
-
-    //squares
-    q31_t squares_q [4];
-    float32_t squares_f [4];
-    arm_mult_q31(quaternion, quaternion, squares_q, 4);
-    arm_q31_to_float(squares_q, squares_f, 4);
-
-    float32_t result[3];
-
-
-    //mixed products: wx, yz, wy, zx, wz, xy
-    q31_t mixed_q [6];
-    float32_t mixed_f [6];
-    arm_mult_q31(quaternion, quaternion+1, mixed_q, 1);
-    arm_mult_q31(quaternion+2, quaternion+3, mixed_q+1, 1);
-    arm_mult_q31(quaternion, quaternion+2, mixed_q+2, 1);
-    arm_mult_q31(quaternion+3, quaternion+1, mixed_q+3, 1);
-    arm_mult_q31(quaternion, quaternion+3, mixed_q+4, 1);
-    arm_mult_q31(quaternion+1, quaternion+2, mixed_q+5, 1);
-    arm_q31_to_float(mixed_q, mixed_f, 6);
+void mpu6050_getRollPitchYaw(Quternion_TypeDef *quaternion, float32_t *rpy) {
 
     //roll / bank
-    result[0] = (float32_t)atan2(2*(mixed_f[0] - mixed_f[1]), 1 - 2*(squares_f[1] + squares_f[3])) / M_PI;
+    rpy[0] = (float32_t)atan2(2*((quaternion->w * quaternion->x) - (quaternion->y * quaternion->z)), 1 - 2*((quaternion->x * quaternion->x) + (quaternion->z * quaternion->z)));
 
     //pitch / attitude
-    result[1] = (float32_t)-asin(2*(mixed_f[5] + mixed_f[4])) / M_PI;
+    rpy[1] = (float32_t)-asin(2*((quaternion->x * quaternion->y) + (quaternion->w * quaternion->z)));
 
     //yaw /heading
-    result[2] = (float32_t)atan2(2*(mixed_f[2] - mixed_f[3]), 1 - 2*(squares_f[2] + squares_f[3])) / M_PI;
+    rpy[2] = (float32_t)atan2(2*((quaternion->w * quaternion->y) - (quaternion->z * quaternion->x)), 1 - 2*((quaternion->y * quaternion->y) + (quaternion->z * quaternion->z)));
 
-	arm_float_to_q31(result, rpy, 3);
 }
 
 /*
  * get quaternion and wait
  */
-uint8_t mpu6050_getQuaternionWait(q31_t *quaternion) {
+uint8_t mpu6050_getQuaternionWait(Quternion_TypeDef *quaternion) {
 	//check for overflow
 	mpu6050_fifoCount = mpu6050_getFIFOCount();
 	if ((mpu6050_mpuIntStatus & 0x10) || mpu6050_fifoCount == 512) {
 		//reset
 		mpu6050_resetFIFO();
-		trace_puts("e");
+		trace_puts("!");
 	}
 //	    while(!(mpu6050_getIntStatus() & 0x01)){
 //	        osDelay(1);

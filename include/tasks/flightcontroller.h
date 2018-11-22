@@ -32,10 +32,10 @@ extern UART_HandleTypeDef huart1;
 
 extern TIM_HandleTypeDef htim2;
 
-arm_pid_instance_q31 * roll_pid_instance;
-arm_pid_instance_q31 * pitch_pid_instance;
-arm_pid_instance_q31 * yaw_pid_instance;
-arm_pid_instance_q31 * throttle_pid_instance;
+arm_pid_instance_f32 * roll_pid_instance;
+arm_pid_instance_f32 * pitch_pid_instance;
+arm_pid_instance_f32 * yaw_pid_instance;
+arm_pid_instance_f32 * throttle_pid_instance;
 
 uint32_t front_right_throttle;
 uint32_t front_left_throttle;

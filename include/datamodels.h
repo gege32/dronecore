@@ -11,17 +11,24 @@
 #include "arm_math.h"
 
 typedef struct{
-	q31_t roll;
-	q31_t pitch;
-	q31_t yaw;
-	q31_t height;
+	float32_t roll;
+	float32_t pitch;
+	float32_t yaw;
+	float32_t height;
 }SensorData_TypeDef;
 
 typedef struct{
-    q31_t throttle;
-    q31_t delta_roll;
-    q31_t delta_pitch;
-    q31_t delta_yaw;
+    float32_t w;
+    float32_t x;
+    float32_t y;
+    float32_t z;
+}Quternion_TypeDef;
+
+typedef struct{
+    float32_t throttle;
+    float32_t delta_roll;
+    float32_t delta_pitch;
+    float32_t delta_yaw;
 }ControllerInput_TypeDef;
 
 #define FC_SET_KP 0X01;

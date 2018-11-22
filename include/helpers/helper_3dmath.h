@@ -74,11 +74,11 @@ static Quaternion getConjugate(const Quaternion* q) {
         return tmp;
 }
 
-static float getMagnitudeQuat(const Quaternion* q) {
+static float getMagnitudeQuat(const Quternion_TypeDef* q) {
         return sqrtf(q->w*q->w + q->x*q->x + q->y*q->y + q->z*q->z);
 }
 
-static void normalizeQuat(Quaternion* q) {
+static void normalizeQuat(Quternion_TypeDef* q) {
         float m = getMagnitudeQuat(q);
         q->w /= m;
         q->x /= m;
