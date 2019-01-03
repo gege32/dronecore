@@ -14,7 +14,7 @@
 #include "semihosting/Trace.h"
 #include "datamodels.h"
 
-#define MAX_MOTOR_THROTTLE 2000
+#define MAX_MOTOR_THROTTLE 1700
 #define MAX_LIMIT_MOTOR_THROTTLE 1500
 #define IDLE_MOTOR_THROTTLE 1200
 #define MIN_MOTOR_THROTTLE 1000
@@ -27,6 +27,8 @@
 extern QueueHandle_t sensorDataQueue;
 
 extern QueueHandle_t communicationToFlightControllerDataQueue;
+
+extern QueueHandle_t PIDtuningDataQueue;
 
 extern UART_HandleTypeDef huart1;
 

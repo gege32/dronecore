@@ -87,6 +87,8 @@ QueueHandle_t communicationToFlightControllerDataQueue;
 
 QueueHandle_t communicationToSensorsDataQueue;
 
+QueueHandle_t PIDtuningDataQueue;
+
 RTC_HandleTypeDef hrtc;
 
 /* USER CODE BEGIN PV */
@@ -202,6 +204,7 @@ int main(void)
   /* add queues, ... */
   sensorDataQueue = xQueueCreate(1, sizeof(SensorData_TypeDef));
   communicationToFlightControllerDataQueue = xQueueCreate(1, sizeof(ControllerInput_TypeDef));
+  PIDtuningDataQueue = xQueueCreate(1, sizeof(PIDtuning_TypeDef));
 
   /* USER CODE END RTOS_QUEUES */
 

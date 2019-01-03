@@ -31,6 +31,12 @@ typedef struct{
     float32_t delta_yaw;
 }ControllerInput_TypeDef;
 
+typedef struct{
+    float32_t p;
+    float32_t i;
+    float32_t d;
+}PIDtuning_TypeDef;
+
 #define FC_SET_KP 0X01;
 #define FC_SET_KI 0x02;
 #define FC_SET_KD 0x04;

@@ -20,7 +20,11 @@ void CommunicationTask(void const* argument) {
         trace_puts("nrf1");
     }
 
+    uint32_t offlinecouter = 0;
+
     ControllerInput_TypeDef* incomming = pvPortMalloc(sizeof(ControllerInput_TypeDef));
+
+    PIDtuning_TypeDef* incpid = pvPortMalloc(sizeof(PIDtuning_TypeDef));
 
     osDelay(40);
     // Configure RX PIPE#1
@@ -68,18 +72,22 @@ void CommunicationTask(void const* argument) {
             if (nRF24_payload[0] == '<' && nRF24_payload[18] == '>') {
                 if (nRF24_payload[1] == 0x01) {
 
-                    incomming->throttle = (((uint32_t) nRF24_payload[2] << 24) | ((uint32_t) nRF24_payload[3] << 16) | ((uint32_t) nRF24_payload[4] << 8) | nRF24_payload[5]) / 2147483648.0f;
-//                  incomming->delta_roll = (((uint32_t)nRF24_payload[4] << 24) | ((uint32_t)nRF24_payload[5] << 16) | ((uint32_t)nRF24_payload[6] << 8) | nRF24_payload[7]);
-//                  incomming->delta_pitch = (((uint32_t)nRF24_payload[8] << 24) | ((uint32_t)nRF24_payload[9] << 16) | ((uint32_t)nRF24_payload[10] << 8) | nRF24_payload[11]);
+                    incomming->throttle = (float32_t) (((uint32_t) nRF24_payload[2] << 8) | ((uint32_t) nRF24_payload[3])) +  ((((uint32_t) nRF24_payload[4] << 8) | (uint32_t)nRF24_payload[5]) / 1000.0f);
+                    incomming->delta_roll = (float32_t) (((uint32_t) nRF24_payload[6] << 8) | ((uint32_t) nRF24_payload[7])) +  ((((uint32_t) nRF24_payload[8] << 8) | (uint32_t)nRF24_payload[9]) / 1000.0f);
+                    incomming->delta_pitch = (float32_t) (((uint32_t) nRF24_payload[10] << 8) | ((uint32_t) nRF24_payload[11])) +  ((((uint32_t) nRF24_payload[12] << 8) | (uint32_t)nRF24_payload[13]) / 1000.0f);
 //                  incomming->delta_yaw = (((uint32_t)nRF24_payload[12] << 24) | ((uint32_t)nRF24_payload[13] << 16) | ((uint32_t)nRF24_payload[14] << 8) | nRF24_payload[15]);
-                    incomming->delta_roll = 0.0f;
-                    incomming->delta_pitch = 0.0f;
-                    incomming->delta_yaw = 0.0f;
-                } else {
+                    xQueueOverwrite(communicationToFlightControllerDataQueue, incomming);
+                } else if(nRF24_payload[1] == 0x02){
+                    incpid->p = (float32_t) (((uint32_t) nRF24_payload[2] << 8) | ((uint32_t) nRF24_payload[3])) +  ((((uint32_t) nRF24_payload[4] << 8) | (uint32_t)nRF24_payload[5]) / 1000.0f);
+                    incpid->i = (float32_t) (((uint32_t) nRF24_payload[6] << 8) | ((uint32_t) nRF24_payload[7])) +  ((((uint32_t) nRF24_payload[8] << 8) | (uint32_t)nRF24_payload[9]) / 1000.0f);
+                    incpid->d = (float32_t) (((uint32_t) nRF24_payload[10] << 8) | ((uint32_t) nRF24_payload[11])) +  ((((uint32_t) nRF24_payload[12] << 8) | (uint32_t)nRF24_payload[13]) / 1000.0f);
+                    xQueueOverwrite(PIDtuningDataQueue, incpid);
+                } else{
                     incomming->throttle = 0.0f;
                     incomming->delta_roll = 0.0f;
                     incomming->delta_pitch = 0.0f;
                     incomming->delta_yaw = 0.0f;
+                    xQueueOverwrite(communicationToFlightControllerDataQueue, incomming);
                 }
 
             } else {
@@ -87,9 +95,19 @@ void CommunicationTask(void const* argument) {
                 incomming->delta_roll = 0.0f;
                 incomming->delta_pitch = 0.0f;
                 incomming->delta_yaw = 0.0f;
+                xQueueOverwrite(communicationToFlightControllerDataQueue, incomming);
             }
-            xQueueOverwrite(communicationToFlightControllerDataQueue, incomming);
         }
+//        else{
+//            offlinecouter++;
+//            if(offlinecouter > 20){
+//                nRF24_ClearIRQFlags();
+//                nRF24_SetPowerMode(nRF24_PWR_DOWN);
+//                nRF24_FlushRX();
+//                osDelay(20);
+//                nRF24_SetPowerMode(nRF24_PWR_UP);
+//            }
+//        }
         osDelay(150);
     }
 

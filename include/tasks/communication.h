@@ -20,6 +20,8 @@ extern UART_HandleTypeDef huart1;
 
 extern QueueHandle_t communicationToFlightControllerDataQueue;
 
+extern QueueHandle_t PIDtuningDataQueue;
+
 void CommunicationTask(void const* argument);
 
 #endif /* TASKS_COMMUNICATION_H_ */
