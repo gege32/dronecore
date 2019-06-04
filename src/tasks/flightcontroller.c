@@ -25,16 +25,16 @@ void FlightControllerTask(void* const arguments) {
     throttle_pid_instance = pvPortMalloc(sizeof(arm_pid_instance_f32));
 
     PIDtuning_TypeDef* pid_gains = pvPortMalloc(sizeof(PIDtuning_TypeDef));
-    pid_gains->p = 50.0f;
-    pid_gains->i = 0.0f;
-    pid_gains->d = 0.0f;
+    pid_gains->p = 5.0f;
+    pid_gains->i = 5.0f;
+    pid_gains->d = 5.0f;
 
     float32_t controlled_values[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    float32_t front_right_throttle_f = 0;
-    float32_t front_left_throttle_f = 0;
-    float32_t rear_right_throttle_f = 0;
-    float32_t rear_left_throttle_f = 0;
+    float32_t front_right_throttle_f = 1000;
+    float32_t front_left_throttle_f = 1000;
+    float32_t rear_right_throttle_f = 1000;
+    float32_t rear_left_throttle_f = 1000;
 
     float32_t throttle = 0.0f;
 
@@ -88,7 +88,6 @@ void FlightControllerTask(void* const arguments) {
         xQueueReceive(communicationToFlightControllerDataQueue, comm_buffer, 0);
         new_message = xQueueReceive(sensorDataQueue, buffer, portMAX_DELAY);
 
-//        comm_buffer->throttle = 0.5f;
         if (new_message) {
 
             if (comm_buffer->throttle == 0.0) {
@@ -106,21 +105,27 @@ void FlightControllerTask(void* const arguments) {
                 controlled_values[0] = arm_pid_f32(roll_pid_instance, comm_buffer->delta_roll - buffer->roll);
                 controlled_values[1] = arm_pid_f32(pitch_pid_instance, comm_buffer->delta_pitch - buffer->pitch);
                 controlled_values[2] = arm_pid_f32(yaw_pid_instance, comm_buffer->delta_yaw);
-                controlled_values[3] = arm_pid_f32(throttle_pid_instance, ((comm_buffer->throttle + 1) * 1000) - throttle_avg);
 
-                throttle += controlled_values[3];
 //            throttle = (comm_buffer->throttle + 1) * 1000;
                 //0: roll
                 //1: pitch
                 //2: yaw
                 //3: throttle
 
-                front_left_throttle_f = (throttle + controlled_values[0] - controlled_values[1] + controlled_values[2]);
-                front_right_throttle_f = (throttle - controlled_values[0] - controlled_values[1] - controlled_values[2]);
-                rear_left_throttle_f = (throttle + controlled_values[0] + controlled_values[1] - controlled_values[2]);
-                rear_right_throttle_f = (throttle - controlled_values[0] + controlled_values[1] + controlled_values[2]);
+                front_left_throttle_f = front_left_throttle_f + controlled_values[0] - controlled_values[1] + controlled_values[2];
+                front_right_throttle_f = front_left_throttle_f - controlled_values[0] - controlled_values[1] - controlled_values[2];
+                rear_left_throttle_f = front_left_throttle_f + controlled_values[0] + controlled_values[1] - controlled_values[2];
+                rear_right_throttle_f = front_left_throttle_f - controlled_values[0] + controlled_values[1] + controlled_values[2];
 
                 throttle_avg = (front_left_throttle_f + front_right_throttle_f + rear_right_throttle_f + rear_left_throttle_f) / (float32_t) 4.0;
+
+                controlled_values[3] = arm_pid_f32(throttle_pid_instance, (comm_buffer->throttle + 1) - throttle_avg / 1000);
+                throttle += controlled_values[3];
+
+                front_left_throttle_f = front_left_throttle_f * (throttle + 1);
+                front_right_throttle_f = front_right_throttle_f * (throttle + 1);
+                rear_left_throttle_f = rear_left_throttle_f * (throttle + 1);
+                rear_right_throttle_f = rear_right_throttle_f * (throttle + 1);
 
                 front_left_throttle = (uint32_t) front_left_throttle_f;
                 front_right_throttle = (uint32_t) front_right_throttle_f;
@@ -140,6 +145,19 @@ void FlightControllerTask(void* const arguments) {
                     rear_right_throttle = MAX_LIMIT_MOTOR_THROTTLE;
                 }
 
+                if (front_left_throttle < MIN_MOTOR_THROTTLE) {
+                    front_left_throttle = MIN_MOTOR_THROTTLE;
+                }
+                if (front_right_throttle < MIN_MOTOR_THROTTLE) {
+                    front_right_throttle = MIN_MOTOR_THROTTLE;
+                }
+                if (rear_left_throttle < MIN_MOTOR_THROTTLE) {
+                    rear_left_throttle = MIN_MOTOR_THROTTLE;
+                }
+                if (rear_right_throttle < MIN_MOTOR_THROTTLE) {
+                    rear_right_throttle = MIN_MOTOR_THROTTLE;
+                }
+
                 __HAL_TIM_SET_COMPARE(&htim2, FRONT_LEFT_MOTOR_TIMER, front_left_throttle);
                 __HAL_TIM_SET_COMPARE(&htim2, FRONT_RIGHT_MOTOR_TIMER, front_right_throttle);
                 __HAL_TIM_SET_COMPARE(&htim2, REAR_LEFT_MOTOR_TIMER, rear_left_throttle);
@@ -151,8 +169,8 @@ void FlightControllerTask(void* const arguments) {
 
         }
 
-        snprintf(szoveg, 72, "%+.6f,%+.6f,%+.6f,%+.6f,%+.6f,%+.6f,%+.6f\r\n", buffer->roll, buffer->pitch, buffer->yaw, controlled_values[0], controlled_values[1], controlled_values[2], controlled_values[3]);
-        HAL_UART_Transmit(&huart1, szoveg, 72, 20);
+        snprintf(szoveg, 79, "%+.6f,%+.6f,%+.6f,%+.6f,%+.6f,%+.6f,%+.6f\r\n", buffer->roll, buffer->pitch, buffer->yaw, controlled_values[0], controlled_values[1], controlled_values[2], controlled_values[3]);
+        HAL_UART_Transmit(&huart1, szoveg, 79, 20);
 
         //        snprintf(szoveg, 32, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
         //        HAL_UART_Transmit(&huart1, szoveg, 32, 20);

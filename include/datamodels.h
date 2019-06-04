@@ -25,10 +25,12 @@ typedef struct{
 }Quternion_TypeDef;
 
 typedef struct{
-    float32_t throttle;
-    float32_t delta_roll;
-    float32_t delta_pitch;
-    float32_t delta_yaw;
+    uint32_t throttle;
+    uint32_t delta_roll;
+    uint32_t delta_pitch;
+    uint32_t delta_yaw;
+    uint32_t vra;
+    uint32_t vrb;
 }ControllerInput_TypeDef;
 
 typedef struct{
@@ -36,13 +38,6 @@ typedef struct{
     float32_t i;
     float32_t d;
 }PIDtuning_TypeDef;
-
-#define FC_SET_KP 0X01;
-#define FC_SET_KI 0x02;
-#define FC_SET_KD 0x04;
-#define FC_CALIBRATE_ESC 0x10;
-#define FC_START_MOTOR 0x20;
-#define FC_STOP_MOTOR 0x40;
 
 typedef struct{
 	uint8_t messageType;

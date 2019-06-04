@@ -195,8 +195,6 @@ int main(void)
 
   xTaskCreate(CommunicationTask, "communicationTask", 128, &hspi2, 3, &xCommTask);
 
-
-//  Wifi_Init(osPriorityNormal, &huart2);
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
