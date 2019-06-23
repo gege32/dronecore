@@ -7,25 +7,32 @@
 
 #include "commdriver/fsia6b.h"
 
-void fsia6b_getRemoteControlData(ControllerInput_TypeDef controllerInput){
-    HAL_StatusTypeDef status = HAL_UART_Receive_DMA(&huart2, buffer, PACKAGE_LENGHT);
+void fsia6b_getRemoteControlData(){
+    //since its possible to start the read while the receiver is already sending, I read two packages to make sure to read 1 full package
+    HAL_StatusTypeDef status = HAL_UART_Receive_DMA(&huart2, buffer, PACKAGE_LENGHT * 2);
 }
 
-void fsia6b_init(QueueHandle_t *queueHandle){
-    commQueue = queueHandle;
-    buffer = pvPortMalloc(sizeof(uint8_t) * PACKAGE_LENGHT);
+void fsia6b_init(){
+    buffer = pvPortMalloc(sizeof(uint8_t) * PACKAGE_LENGHT * 2);
+    controllerInput = pvPortMalloc(sizeof(ControllerInput_TypeDef));
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    ControllerInput_TypeDef controllerinput = pvPortMalloc(sizeof(ControllerInput_TypeDef));
-    if(buffer[0] == 0x20 && buffer[1] == 0x40){
-        controllerinput->throttle = buffer[7] << 8 | buffer[6];
-        controllerinput->delta_roll = buffer[3] << 8 | buffer[2];
-        controllerinput->delta_pitch = buffer[5] << 8 | buffer[4];
-        controllerinput->delta_yaw = buffer[9] << 8 | buffer[8];
-        controllerinput->vra = buffer[11] << 8 | buffer[10];
-        controllerinput->vrb = buffer[13] << 8 | buffer[12];
-        xQueueOverwrite(commQueue, controllerinput);
+    int index = 0;
+    for(;(buffer[index] != 0x20 && buffer[index+1] != 0x40) || index > PACKAGE_LENGHT; index++);
+    if(buffer[index+0] == 0x20 && buffer[index+1] == 0x40){
+        controllerInput->throttle = buffer[index+7] << 8 | buffer[index+6];
+        controllerInput->delta_roll = (float32_t)((buffer[index+3] << 8 | buffer[index+2]) - 1500) / 500.0;
+        controllerInput->delta_pitch = (float32_t)((buffer[index+5] << 8 | buffer[index+4]) - 1500) / 500.0;
+        controllerInput->delta_yaw = (float32_t)((buffer[index+9] << 8 | buffer[index+8]) - 1500 ) / 500.0;
+        controllerInput->vra = buffer[index+11] << 8 | buffer[index+10];
+        controllerInput->vrb = buffer[index+13] << 8 | buffer[index+12];
+
+        controllerInput->swa = buffer[index+15] << 8 | buffer[index+14];
+        controllerInput->swb = buffer[index+17] << 8 | buffer[index+16];
+        controllerInput->swc = buffer[index+19] << 8 | buffer[index+18];
+        controllerInput->armMotors = (buffer[index+21] << 8 | buffer[index+20]) - 1000;
+        xQueueOverwriteFromISR(communicationToFlightControllerDataQueue, controllerInput, pdFALSE);
     }
 }

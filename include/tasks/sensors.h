@@ -29,4 +29,4 @@ CalibrationData * bmp180_calibration_data;
 void SensorMeasurementTask(void const* argument);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 
-#endif /* TASKS_SENSORS_H_ */
+#endif TASKS_SENSORS_H_

@@ -12,13 +12,11 @@
 #include "cmsis_os.h"
 #include "semihosting/Trace.h"
 
-#include "commdriver/nrf24.h"
+#include "commdriver/fsia6b.h"
 
 #include "datamodels.h"
 
 extern UART_HandleTypeDef huart1;
-
-extern QueueHandle_t communicationToFlightControllerDataQueue;
 
 extern QueueHandle_t PIDtuningDataQueue;
 

@@ -44,16 +44,9 @@ void SensorMeasurementTask(void const* argument) {
     mpu6050_dmpInitialize();
     mpu6050_dmpEnable();
 
-    /* Configure PA5 pin as input floating */
-    GPIO_InitTypeDef GPIO_InitStructure;
-    GPIO_InitStructure.Mode = GPIO_MODE_IT_RISING;
-    GPIO_InitStructure.Pull = GPIO_NOPULL;
-    GPIO_InitStructure.Pin = GPIO_PIN_5;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-    //Configure EXTI5-9 interrupt port
-    HAL_NVIC_SetPriority(EXTI9_5_IRQn, 8, 0);
-    HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+    /* EXTI interrupt init*/
+    HAL_NVIC_SetPriority(EXTI1_IRQn, 7, 0);
+    HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 
     float32_t data_f[3];
 
@@ -73,16 +66,16 @@ void SensorMeasurementTask(void const* argument) {
         sensor_data->yaw = data_f[1];
         sensor_data->height = 0;
 
-        xQueueSend(sensorDataQueue, sensor_data, 1);
+        xQueueOverwrite(sensorDataQueue, sensor_data);
 
-//        snprintf(szoveg, 32, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
-//        HAL_UART_Transmit(&huart1, szoveg, 32, 20);
+        snprintf(szoveg, 32, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
+        HAL_UART_Transmit(&huart1, szoveg, 32, 20);
     }
 
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    if (GPIO_Pin == GPIO_PIN_5) {
+    if (GPIO_Pin == GPIO_PIN_1) {
         xSemaphoreGiveFromISR(dataReady, pdFALSE);
     }
 }

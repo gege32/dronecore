@@ -12,10 +12,14 @@ extern UART_HandleTypeDef huart2;
 
 uint8_t *buffer;
 
-QueueHandle_t *commQueue;
+extern QueueHandle_t communicationToFlightControllerDataQueue;
 
-void fsia6b_init(QueueHandle_t *queueHandle);
+ControllerInput_TypeDef* controllerInput;
 
-void fsia6b_getRemoteControlData(ControllerInput_TypeDef controllerInput);
+void fsia6b_init();
+
+void fsia6b_getRemoteControlData();
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 
 #endif __FSIA6B_H

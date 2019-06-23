@@ -26,11 +26,15 @@ typedef struct{
 
 typedef struct{
     uint32_t throttle;
-    uint32_t delta_roll;
-    uint32_t delta_pitch;
-    uint32_t delta_yaw;
+    float32_t delta_roll;
+    float32_t delta_pitch;
+    float32_t delta_yaw;
     uint32_t vra;
     uint32_t vrb;
+    uint32_t swa;
+    uint32_t swb;
+    uint32_t swc;
+    uint32_t armMotors;
 }ControllerInput_TypeDef;
 
 typedef struct{

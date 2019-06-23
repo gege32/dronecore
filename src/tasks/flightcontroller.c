@@ -58,6 +58,9 @@ void FlightControllerTask(void* const arguments) {
     arm_pid_init_f32(yaw_pid_instance, 1);
     arm_pid_init_f32(throttle_pid_instance, 1);
 
+    //stop running before reveicer is turned on
+//    while(pdTRUE != xQueueReceive(communicationToFlightControllerDataQueue, comm_buffer, 2000));
+
     HAL_TIM_Base_Start(&htim2);
 
     HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
@@ -90,7 +93,7 @@ void FlightControllerTask(void* const arguments) {
 
         if (new_message) {
 
-            if (comm_buffer->throttle == 0.0) {
+            if (comm_buffer->throttle == 0.0 && !comm_buffer->armMotors) {
                 __HAL_TIM_SET_COMPARE(&htim2, FRONT_LEFT_MOTOR_TIMER, MIN_MOTOR_THROTTLE);
                 __HAL_TIM_SET_COMPARE(&htim2, FRONT_RIGHT_MOTOR_TIMER, MIN_MOTOR_THROTTLE);
                 __HAL_TIM_SET_COMPARE(&htim2, REAR_LEFT_MOTOR_TIMER, MIN_MOTOR_THROTTLE);
@@ -113,19 +116,18 @@ void FlightControllerTask(void* const arguments) {
                 //3: throttle
 
                 front_left_throttle_f = front_left_throttle_f + controlled_values[0] - controlled_values[1] + controlled_values[2];
-                front_right_throttle_f = front_left_throttle_f - controlled_values[0] - controlled_values[1] - controlled_values[2];
-                rear_left_throttle_f = front_left_throttle_f + controlled_values[0] + controlled_values[1] - controlled_values[2];
-                rear_right_throttle_f = front_left_throttle_f - controlled_values[0] + controlled_values[1] + controlled_values[2];
+                front_right_throttle_f = front_right_throttle_f + controlled_values[0] - controlled_values[1] - controlled_values[2];
+                rear_left_throttle_f = rear_left_throttle_f + controlled_values[0] + controlled_values[1] - controlled_values[2];
+                rear_right_throttle_f = rear_right_throttle_f + controlled_values[0] + controlled_values[1] + controlled_values[2];
 
                 throttle_avg = (front_left_throttle_f + front_right_throttle_f + rear_right_throttle_f + rear_left_throttle_f) / (float32_t) 4.0;
 
-                controlled_values[3] = arm_pid_f32(throttle_pid_instance, (comm_buffer->throttle + 1) - throttle_avg / 1000);
-                throttle += controlled_values[3];
+                throttle = comm_buffer->throttle / throttle_avg;
 
-                front_left_throttle_f = front_left_throttle_f * (throttle + 1);
-                front_right_throttle_f = front_right_throttle_f * (throttle + 1);
-                rear_left_throttle_f = rear_left_throttle_f * (throttle + 1);
-                rear_right_throttle_f = rear_right_throttle_f * (throttle + 1);
+                front_left_throttle_f = front_left_throttle_f * throttle;
+                front_right_throttle_f = front_right_throttle_f * throttle;
+                rear_left_throttle_f = rear_left_throttle_f * throttle;
+                rear_right_throttle_f = rear_right_throttle_f * throttle;
 
                 front_left_throttle = (uint32_t) front_left_throttle_f;
                 front_right_throttle = (uint32_t) front_right_throttle_f;
@@ -169,8 +171,11 @@ void FlightControllerTask(void* const arguments) {
 
         }
 
-        snprintf(szoveg, 79, "%+.6f,%+.6f,%+.6f,%+.6f,%+.6f,%+.6f,%+.6f\r\n", buffer->roll, buffer->pitch, buffer->yaw, controlled_values[0], controlled_values[1], controlled_values[2], controlled_values[3]);
-        HAL_UART_Transmit(&huart1, szoveg, 79, 20);
+//        snprintf(szoveg, 79, "%+.6f,%+.6f,%+.6f,%+.6f,%+.6f,%+.6f,%+.6f\r\n", buffer->roll, buffer->pitch, buffer->yaw, controlled_values[0], controlled_values[1], controlled_values[2], controlled_values[3]);
+//        HAL_UART_Transmit(&huart1, szoveg, 79, 20);
+
+//        snprintf(szoveg, 51, "%+.6f,%+.6f,%+.6f,%i,%i,%i,%i\r\n", buffer->roll, buffer->pitch, buffer->yaw, front_left_throttle, front_right_throttle, rear_left_throttle, rear_right_throttle);
+//        HAL_UART_Transmit(&huart1, szoveg, 51, 20);
 
         //        snprintf(szoveg, 32, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
         //        HAL_UART_Transmit(&huart1, szoveg, 32, 20);

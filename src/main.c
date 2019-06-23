@@ -67,6 +67,8 @@ I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
+DMA_HandleTypeDef hdma_usart2_rx;
+
 SPI_HandleTypeDef hspi2;
 
 TIM_HandleTypeDef htim2;
@@ -99,6 +101,7 @@ RTC_HandleTypeDef hrtc;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART1_UART_Init(void);
@@ -150,6 +153,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_ADC1_Init();
   MX_I2C1_Init();
   MX_USART1_UART_Init();
@@ -180,8 +184,8 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  BaseType_t task1 = xTaskCreate(SensorMeasurementTask, "sensorTask", 512, &hi2c1, 5, &xSensorsTask);
-  BaseType_t task2 = xTaskCreate(FlightControllerTask, "flightControllerTask", 256, NULL, 4, &xFlightControllerTask);
+  BaseType_t task1 = xTaskCreate(SensorMeasurementTask, "sensorTask", 700, &hi2c1, 5, &xSensorsTask);
+  BaseType_t task2 = xTaskCreate(FlightControllerTask, "flightControllerTask", 700, NULL, 4, &xFlightControllerTask);
 
   if(task1 != pdPASS){
 	  trace_puts("task1fail");
@@ -193,7 +197,7 @@ int main(void)
   unsigned char test [] = "test";
   HAL_UART_Transmit(&huart1, test, 4, 10);
 
-  xTaskCreate(CommunicationTask, "communicationTask", 128, &hspi2, 3, &xCommTask);
+  xTaskCreate(CommunicationTask, "communicationTask", 700, &hspi2, 3, &xCommTask);
 
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -552,6 +556,21 @@ static void MX_USART2_UART_Init(void)
 
 }
 
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel6_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel6_IRQn, 7, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel6_IRQn);
+
+}
+
 /** Configure pins as
         * Analog
         * Input
@@ -581,8 +600,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PA5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  /*Configure GPIO pin : PA1 */
+  GPIO_InitStruct.Pin = GPIO_PIN_1;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
