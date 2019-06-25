@@ -44,14 +44,14 @@ void SensorMeasurementTask(void const* argument) {
     mpu6050_dmpInitialize();
     mpu6050_dmpEnable();
 
-    /* EXTI interrupt init*/
-    HAL_NVIC_SetPriority(EXTI1_IRQn, 7, 0);
-    HAL_NVIC_EnableIRQ(EXTI1_IRQn);
-
     float32_t data_f[3];
 
     SensorData_TypeDef* sensor_data = pvPortMalloc(sizeof(SensorData_TypeDef));
     Quternion_TypeDef* quaternion = pvPortMalloc(sizeof(Quternion_TypeDef));
+
+    /* EXTI interrupt init*/
+    HAL_NVIC_SetPriority(EXTI1_IRQn, 7, 0);
+    HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 
     for (;;) {
 
@@ -68,8 +68,8 @@ void SensorMeasurementTask(void const* argument) {
 
         xQueueOverwrite(sensorDataQueue, sensor_data);
 
-        snprintf(szoveg, 32, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
-        HAL_UART_Transmit(&huart1, szoveg, 32, 20);
+//        snprintf(szoveg, 32, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
+//        HAL_UART_Transmit(&huart1, szoveg, 32, 20);
     }
 
 }

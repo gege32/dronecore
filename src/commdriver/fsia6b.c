@@ -20,7 +20,7 @@ void fsia6b_init(){
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     int index = 0;
-    for(;(buffer[index] != 0x20 && buffer[index+1] != 0x40) || index > PACKAGE_LENGHT; index++);
+    for(;(buffer[index] != 0x20 && buffer[index+1] != 0x40) && index < PACKAGE_LENGHT + 1; index++);
     if(buffer[index+0] == 0x20 && buffer[index+1] == 0x40){
         controllerInput->throttle = buffer[index+7] << 8 | buffer[index+6];
         controllerInput->delta_roll = (float32_t)((buffer[index+3] << 8 | buffer[index+2]) - 1500) / 500.0;

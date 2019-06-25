@@ -184,8 +184,8 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  BaseType_t task1 = xTaskCreate(SensorMeasurementTask, "sensorTask", 700, &hi2c1, 5, &xSensorsTask);
-  BaseType_t task2 = xTaskCreate(FlightControllerTask, "flightControllerTask", 700, NULL, 4, &xFlightControllerTask);
+  BaseType_t task1 = xTaskCreate(SensorMeasurementTask, "sensorTask", 512, &hi2c1, osPriorityNormal, &xSensorsTask);
+  BaseType_t task2 = xTaskCreate(FlightControllerTask, "flightControllerTask", 512, NULL, osPriorityNormal, &xFlightControllerTask);
 
   if(task1 != pdPASS){
 	  trace_puts("task1fail");
@@ -197,7 +197,7 @@ int main(void)
   unsigned char test [] = "test";
   HAL_UART_Transmit(&huart1, test, 4, 10);
 
-  xTaskCreate(CommunicationTask, "communicationTask", 700, &hspi2, 3, &xCommTask);
+  xTaskCreate(CommunicationTask, "communicationTask", 512, &hspi2, osPriorityNormal, &xCommTask);
 
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -629,18 +629,23 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+volatile UBaseType_t uxHighWaterMark;
 
 /* StartDefaultTask function */
 void StartDefaultTask(void const * argument)
 {
 
+
+
   for(;;)
   {
+      uxHighWaterMark = uxTaskGetStackHighWaterMark(xCommTask);
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
       osDelay(500);
-
+      uxHighWaterMark = uxTaskGetStackHighWaterMark(xCommTask);
 	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
       osDelay(500);
+
   }
   /* USER CODE END 5 */
 }
