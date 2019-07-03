@@ -10,11 +10,13 @@ extern UART_HandleTypeDef huart2;
 
 #define PACKAGE_LENGHT 32
 
-uint8_t *buffer;
+uint8_t buffer[64];
 
 extern QueueHandle_t communicationToFlightControllerDataQueue;
 
 ControllerInput_TypeDef* controllerInput;
+
+SemaphoreHandle_t controllerDataReady;
 
 void fsia6b_init();
 

@@ -66,7 +66,6 @@ I2C_HandleTypeDef hi2c1;
 
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
-
 DMA_HandleTypeDef hdma_usart2_rx;
 
 SPI_HandleTypeDef hspi2;
@@ -101,7 +100,6 @@ RTC_HandleTypeDef hrtc;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART1_UART_Init(void);
@@ -110,6 +108,7 @@ static void MX_USART2_UART_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_RTC_Init(void);
 static void MX_SPI2_Init(void);
+static void MX_DMA_Init(void);
 void StartDefaultTask(void const * argument);
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
@@ -153,7 +152,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_ADC1_Init();
   MX_I2C1_Init();
   MX_USART1_UART_Init();
@@ -161,6 +159,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM3_Init();
   MX_SPI2_Init();
+  MX_DMA_Init();
 //  MX_RTC_Init();
   /* USER CODE BEGIN 2 */
 
@@ -184,8 +183,8 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  BaseType_t task1 = xTaskCreate(SensorMeasurementTask, "sensorTask", 512, &hi2c1, osPriorityNormal, &xSensorsTask);
-  BaseType_t task2 = xTaskCreate(FlightControllerTask, "flightControllerTask", 512, NULL, osPriorityNormal, &xFlightControllerTask);
+  BaseType_t task1 = xTaskCreate(SensorMeasurementTask, "sensorTask", 400, &hi2c1, osPriorityNormal, &xSensorsTask);
+  BaseType_t task2 = xTaskCreate(FlightControllerTask, "flightControllerTask", 400, NULL, osPriorityNormal, &xFlightControllerTask);
 
   if(task1 != pdPASS){
 	  trace_puts("task1fail");
@@ -197,7 +196,7 @@ int main(void)
   unsigned char test [] = "test";
   HAL_UART_Transmit(&huart1, test, 4, 10);
 
-  xTaskCreate(CommunicationTask, "communicationTask", 512, &hspi2, osPriorityNormal, &xCommTask);
+  xTaskCreate(CommunicationTask, "communicationTask", 400, &hspi2, osPriorityNormal, &xCommTask);
 
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -234,6 +233,13 @@ int main(void)
 
 }
 
+void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName ){
+    while (1)
+    {
+
+    }
+}
+
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -267,8 +273,8 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV8;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV8;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV4;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
@@ -629,7 +635,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
-volatile UBaseType_t uxHighWaterMark;
+//volatile UBaseType_t uxHighWaterMark;
 
 /* StartDefaultTask function */
 void StartDefaultTask(void const * argument)
@@ -639,10 +645,10 @@ void StartDefaultTask(void const * argument)
 
   for(;;)
   {
-      uxHighWaterMark = uxTaskGetStackHighWaterMark(xCommTask);
+//      uxHighWaterMark = uxTaskGetStackHighWaterMark(xCommTask);
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
       osDelay(500);
-      uxHighWaterMark = uxTaskGetStackHighWaterMark(xCommTask);
+//      uxHighWaterMark = uxTaskGetStackHighWaterMark(xCommTask);
 	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
       osDelay(500);
 

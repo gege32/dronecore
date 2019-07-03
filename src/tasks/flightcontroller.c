@@ -74,10 +74,7 @@ void FlightControllerTask(void* const arguments) {
 
     for (;;) {
 
-        xQueueReceive(sensorDataQueue, buffer, portMAX_DELAY);
-        xQueueReceive(communicationToFlightControllerDataQueue, comm_buffer, 0);
-
-        new_message = xQueueReceive(PIDtuningDataQueue, pid_gains, 0);
+        new_message = xQueueReceive(PIDtuningDataQueue, &pid_gains, 0);
         if (new_message == pdTRUE) {
             roll_pid_instance->Kp = pitch_pid_instance->Kp = yaw_pid_instance->Kp = pid_gains->p;
             roll_pid_instance->Ki = pitch_pid_instance->Ki = yaw_pid_instance->Ki = pid_gains->i;
@@ -88,8 +85,14 @@ void FlightControllerTask(void* const arguments) {
             throttle = 0.0f;
         }
 
-        xQueueReceive(communicationToFlightControllerDataQueue, comm_buffer, 0);
-        new_message = xQueueReceive(sensorDataQueue, buffer, portMAX_DELAY);
+        xQueueReceive(communicationToFlightControllerDataQueue, &comm_buffer, 0);
+        new_message = xQueueReceive(sensorDataQueue, &buffer, portMAX_DELAY);
+
+        volatile UBaseType_t uxHighWaterMark;
+        uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
+        if(uxHighWaterMark < 100){
+            trace_puts("fuck");
+        }
 
         if (new_message) {
 
@@ -165,8 +168,8 @@ void FlightControllerTask(void* const arguments) {
                 __HAL_TIM_SET_COMPARE(&htim2, REAR_LEFT_MOTOR_TIMER, rear_left_throttle);
                 __HAL_TIM_SET_COMPARE(&htim2, REAR_RIGHT_MOTOR_TIMER, rear_right_throttle);
 
-//            snprintf(szoveg, 22, "%i,%i,%i,%i\r\n", front_left_throttle, front_right_throttle, rear_left_throttle, rear_right_throttle);
-//            HAL_UART_Transmit(&huart1, szoveg, 22, 20);
+            snprintf(szoveg, 22, "%i,%i,%i,%i\r\n", front_left_throttle, front_right_throttle, rear_left_throttle, rear_right_throttle);
+            HAL_UART_Transmit(&huart1, szoveg, 22, 20);
             }
 
         }
@@ -174,8 +177,8 @@ void FlightControllerTask(void* const arguments) {
 //        snprintf(szoveg, 79, "%+.6f,%+.6f,%+.6f,%+.6f,%+.6f,%+.6f,%+.6f\r\n", buffer->roll, buffer->pitch, buffer->yaw, controlled_values[0], controlled_values[1], controlled_values[2], controlled_values[3]);
 //        HAL_UART_Transmit(&huart1, szoveg, 79, 20);
 
-        snprintf(szoveg, 51, "%+.6f,%+.6f,%+.6f,%i,%i,%i,%i\r\n", buffer->roll, buffer->pitch, buffer->yaw, front_left_throttle, front_right_throttle, rear_left_throttle, rear_right_throttle);
-        HAL_UART_Transmit(&huart1, szoveg, 51, 20);
+//        snprintf(szoveg, 51, "%+.6f,%+.6f,%+.6f,%i,%i,%i,%i\r\n", buffer->roll, buffer->pitch, buffer->yaw, front_left_throttle, front_right_throttle, rear_left_throttle, rear_right_throttle);
+//        HAL_UART_Transmit(&huart1, szoveg, 51, 20);
 
         //        snprintf(szoveg, 32, "%+.6f,%+.6f,%+.6f\r\n", data_f[0], data_f[1], data_f[2]);
         //        HAL_UART_Transmit(&huart1, szoveg, 32, 20);
